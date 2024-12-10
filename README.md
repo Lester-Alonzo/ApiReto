@@ -16,6 +16,7 @@ Esta api esta disenada para las necesidades de Mi Tiendita Online supliendo todo
   - /auth/register
   - /auth/change_password
   - /auth/confirm_email/:user_hash
+  - /auth/verify_session
 - /productos: Ruta para administrar los productos de la empresa
   - /productos/crear
   - /productos/editar/:id
