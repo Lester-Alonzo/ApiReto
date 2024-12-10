@@ -1,5 +1,10 @@
 # Api para Mi Tiendita Online
 
+![Node.js](https://img.shields.io/badge/Node.js-8CC84A?style=for-the-badge&logo=node.js&logoColor=white)
+![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white)
+![SQL Server](https://img.shields.io/badge/Microsoft_SQL_Server-CC2927?style=for-the-badge&logo=microsoft-sql-server&logoColor=white)
+![Docker](https://img.shields.io/badge/Docker-2CA5E0?style=for-the-badge&logo=docker&logoColor=white)
+
 ---
 
 Esta api esta disenada para las necesidades de Mi Tiendita Online supliendo todos los apartados que podria necesitar tando a nivel administrativo como a nivel tecnico.
