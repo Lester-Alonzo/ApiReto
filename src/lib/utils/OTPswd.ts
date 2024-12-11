@@ -1,17 +1,17 @@
 import * as crypto from "crypto"
-import { IVTEXT, KEYTEXT } from '../constants'
+import { IVTEXT, KEYTEXT } from "../constants"
 
 export class PswUtils {
   #config_max_numbers: number
   #config_sed_ramdomText: string
-  #keyText:Buffer
-  #iv:Buffer
-  #alg:string
+  #keyText: Buffer
+  #iv: Buffer
+  #alg: string
   constructor(m_numbers: number, sed: string) {
     this.#config_max_numbers = m_numbers
     this.#config_sed_ramdomText = sed
     this.#keyText = Buffer.from(KEYTEXT, "hex")
-    this.#iv = Buffer.from(IVTEXT, "hex") 
+    this.#iv = Buffer.from(IVTEXT, "hex")
     this.#alg = "aes-256-cbc"
   }
   async OTPNumber(): Promise<number[]> {
@@ -24,17 +24,17 @@ export class PswUtils {
       resolve(returnned)
     })
   }
-  #encrypt(text:string) {
-  const cipher = crypto.createCipheriv(this.#alg, this.#keyText, this.#iv)
-  let encrypted = cipher.update(text, "utf8", "hex")
-  encrypted += cipher.final("hex")
-  return encrypted
+  #encrypt(text: string) {
+    const cipher = crypto.createCipheriv(this.#alg, this.#keyText, this.#iv)
+    let encrypted = cipher.update(text, "utf8", "hex")
+    encrypted += cipher.final("hex")
+    return encrypted
   }
-  #decrypt(encryptedData:string) {
-  const decipher = crypto.createDecipheriv(this.#alg, this.#keyText, this.#iv)
-  let decrypted = decipher.update(encryptedData, "hex", "utf8")
-  decrypted += decipher.final("utf8")
-  return decrypted
+  #decrypt(encryptedData: string) {
+    const decipher = crypto.createDecipheriv(this.#alg, this.#keyText, this.#iv)
+    let decrypted = decipher.update(encryptedData, "hex", "utf8")
+    decrypted += decipher.final("utf8")
+    return decrypted
   }
   async UserHash(): Promise<string> {
     return new Promise((resolve, reject) => {})
@@ -52,4 +52,3 @@ const pureba = new PswUtils(4, "lag")
 
 pureba.OTPNumber().then((j) => console.log(j))
 pureba.prueba()
-
