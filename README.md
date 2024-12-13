@@ -48,19 +48,4 @@ Utilizando Docker Compose
 ```bash
     docker compose up
 ```
-
-## Comandos utiles
-
-| Dialect       | Install                              |
-| ------------- | ------------------------------------ |
-| MySQL/MariaDB | `npm install sequelize mysql2`       |
-| Postgres      | `npm install sequelize pg pg-hstore` |
-| Sqlite        | `npm install sequelize sqlite3`      |
-| MSSQL         | `npm install sequelize tedious`      |
-
-```bash
-npm install sequelize-auto
-npx sequelize-auto -o "./src/db/models" -d EcomerceV3 -h localhost -u sa -p 1433 -x <password of db> -l ts --useDefine  -e mssql
-```
-
 > [!info] Esta version incluye la imagen de SQLServer
