@@ -1,14 +1,16 @@
+//Librerias
 import type { Request, Response } from "express"
-import {Credentials, LoginSche} from '../lib/zchemas'
-import { sequelize } from '../db/mssql'
 import { QueryTypes } from "@sequelize/core"
+import jwt from 'jsonwebtoken'
+import {randomUUID} from 'crypto'
+//Arvhicos Locales
+import {Credentials, LoginSche, PassVal} from '../lib/zchemas'
+import { sequelize } from '../db/mssql'
 import {ComparePassword, HassPass} from '../lib/utils/encry'
 import {PswUtils} from '../lib/utils/OTPswd'
 import type {usuariosAtt} from '../db/models/usuarios'
-import jwt from 'jsonwebtoken'
 import {secreKeyJWT} from '../lib/constants'
 import {keyDB} from '../db/keydbConf'
-import {randomUUID} from 'crypto'
 
 const PsU = new PswUtils(4, "fasfafadsf")
 
@@ -39,6 +41,10 @@ export async function Login(req: Request, res: Response) {
   await keyDB.hmset(acceskey, {datos:payload, code: rnumber})
   //Se setea un header con la key de KeyDB
   res.setHeader("Authorization", `Bearer ${acceskey}`)
+  res.cookie("sessionKey", acceskey, {
+    httpOnly:true,
+    maxAge:18000000
+  })
   res.status(200).json({token:token, error:null})
   } catch (error) {
     res.status(404).json({token:null, error:error})
@@ -65,4 +71,55 @@ try {
 } catch (error) {
   res.status(404).json({created:false, error:error})
 }
+}
+
+export async function ChangePass(req:Request, res:Response) {
+  let {email} = req.body
+  let ruid = randomUUID()
+  try {
+    let [resultados]:usuariosAtt[] = await sequelize.query("SELECT * FROM usuarios WHERE correo_electronico = :email", {
+      replacements: {email:email},
+      type: QueryTypes.SELECT
+    })
+  let url = `${req.protocol}://${req.host}${req.baseUrl}/cpass_confirm/${ruid}`
+  await keyDB.set(ruid, `${email}-${resultados.idusuarios}-${new Date().getTime()}`)
+    if(resultados === undefined) throw new Error("Usuario no encontrado")
+      //TODO: Enviar la url a el email por ahora se regresa en el response
+      res.status(200).json({url})
+  } catch (error) {
+    res.status(400).json({error})
+  }
+}
+export async function CpassC(req:Request, res:Response) {
+  const {key} = req.params
+  console.log(key, await keyDB.exists(key))
+  try {
+    if(!key || await keyDB.exists(key) === 0) throw new Error("Llave erronea")
+    await keyDB.del(key)
+  //TODO: redireccionar a frontend donde se cambiara la password
+    res.status(300).redirect("https://google.com")
+  } catch (error) {
+    res.status(400).json({error})
+  }
+}
+
+export async function ChanginPass(req:Request, res:Response) {
+  const {newpass} = req.body
+  const {id} = req.params
+  console.log(newpass, id)
+  try {
+    let validpass = PassVal.parse(newpass)
+    const passH = await HassPass(validpass, 10)
+    const [resultado] = await sequelize.query("EXEC ActualizarCampoUsuario :id, :Campo, :NuevoValor", {
+      replacements:{
+        id,
+        Campo: "password",
+        NuevoValor: passH
+      }
+    })
+    res.status(200).json({})
+  } catch (error) {
+    console.log(error)
+    res.status(404).json({error})
+  }
 }
