@@ -1,5 +1,5 @@
 import { DataTypes, type Sequelize, Model } from "@sequelize/core"
-import {usuariosModel} from './usuarios'
+import { usuariosModel } from "./usuarios"
 
 interface RolAtt {
   idrol?: number

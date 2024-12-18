@@ -3,6 +3,7 @@ import cors from "cors"
 import { serve as SWServe, setup as SWSetup } from "swagger-ui-express"
 import { swaggerDosc } from "../swaggerDef"
 import { auth } from "./routes/auth.route"
+import { producto } from "./routes/producto.route"
 // import {models} from './db/mssql'
 // import {Express} from './types'
 
@@ -17,12 +18,13 @@ app.use("/api-docs", SWServe, SWSetup(swaggerDosc))
 // app.use((req:Express.RequestE, res, next) => {
 //     req.context = {
 //         models,
-//         me:"" 
+//         me:""
 //     }
 // })
 
 //routes
 
 app.use("/auth", auth)
+app.use("/productos", producto)
 
 export { app }

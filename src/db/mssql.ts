@@ -3,12 +3,12 @@ import { MsSqlDialect } from "@sequelize/mssql"
 //modelos
 import { RolModel } from "./models/rol"
 import { EstadosModel } from "./models/estados"
-import {CateProductModel} from './models/categoria_producto'
-import {ClientesModel} from './models/clientes'
-import {OrdenModel} from './models/orden'
-import {OdenDetalleModel} from './models/orden_detalle'
-import {ProductoModel} from './models/producto'
-import {usuariosModel} from './models/usuarios'
+import { CateProductModel } from "./models/categoria_producto"
+import { ClientesModel } from "./models/clientes"
+import { OrdenModel } from "./models/orden"
+import { OdenDetalleModel } from "./models/orden_detalle"
+import { ProductoModel } from "./models/producto"
+import { usuariosModel } from "./models/usuarios"
 
 export const sequelize = new Sequelize({
   dialect: MsSqlDialect,
@@ -26,16 +26,15 @@ export const sequelize = new Sequelize({
   trustServerCertificate: true,
 })
 export const models = {
- rol: RolModel(sequelize),
- estados: EstadosModel(sequelize),
- clientes: ClientesModel(sequelize),
- usuarios: usuariosModel(sequelize),
- categoriaProductos: CateProductModel(sequelize),
- orden:OrdenModel(sequelize),
- ordenDetalle:OdenDetalleModel(sequelize),
- productos: ProductoModel(sequelize)
+  rol: RolModel(sequelize),
+  estados: EstadosModel(sequelize),
+  clientes: ClientesModel(sequelize),
+  usuarios: usuariosModel(sequelize),
+  categoriaProductos: CateProductModel(sequelize),
+  orden: OrdenModel(sequelize),
+  ordenDetalle: OdenDetalleModel(sequelize),
+  productos: ProductoModel(sequelize),
 }
-
 
 // const defineAssociations = () => {
 //   //relaciones de usuario
