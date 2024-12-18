@@ -7,6 +7,8 @@ import {PswUtils} from '../lib/utils/OTPswd'
 import type {usuariosAtt} from '../db/models/usuarios'
 import jwt from 'jsonwebtoken'
 import {secreKeyJWT} from '../lib/constants'
+import {keyDB} from '../db/keydbConf'
+import {randomUUID} from 'crypto'
 
 const PsU = new PswUtils(4, "fasfafadsf")
 
@@ -19,19 +21,24 @@ export async function Login(req: Request, res: Response) {
       type: QueryTypes.SELECT
     })
     if(resultados === undefined) throw new Error("Usuario no encontrado")
+    //Generar un numero random para la OTP
     const rnumber = await PsU.OTPNumber()
+    //Validar que la password consida con el hash de la db
     let result = await ComparePassword(pass, resultados.password)
     if(!result) throw new Error("Contrasena incorrecta")
-    //TODO: Generar el JWT y el codigo de Session para keydb
+    //* Generar el JWT y el codigo de Session para keydb
   const payload = {
     idu: resultados.idusuarios,
     rol: resultados.rol_idrol,
     estado: resultados.estados_idestados,
     nombre: resultados.nombre_completo
   }
-  console.log(payload)
   const token = jwt.sign(payload, secreKeyJWT, {expiresIn:'5h', algorithm:"HS256"})
-    console.log(resultados, rnumber, token)
+  //Guardar la session en KeyDB(equivalente a Redis)
+  let acceskey = randomUUID() 
+  await keyDB.hmset(acceskey, {datos:payload, code: rnumber})
+  //Se setea un header con la key de KeyDB
+  res.setHeader("Authorization", `Bearer ${acceskey}`)
   res.status(200).json({token:token, error:null})
   } catch (error) {
     res.status(404).json({token:null, error:error})
