@@ -2,7 +2,7 @@ import { DataTypes, type Sequelize, Model } from "@sequelize/core"
 import {RolModel} from './rol'
 import {EstadosModel} from './estados'
 
-interface usuariosAtt {
+export interface usuariosAtt {
   idusuarios?: number
   correo_electronico: string
   nombre_completo:string,

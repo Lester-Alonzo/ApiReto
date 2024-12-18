@@ -3,8 +3,8 @@ import cors from "cors"
 import { serve as SWServe, setup as SWSetup } from "swagger-ui-express"
 import { swaggerDosc } from "../swaggerDef"
 import { auth } from "./routes/auth.route"
-import {models} from './db/mssql'
-import {Express} from './types'
+// import {models} from './db/mssql'
+// import {Express} from './types'
 
 const app = express()
 
@@ -14,12 +14,12 @@ app.use(express.urlencoded({ extended: true }))
 app.use("/api-docs", SWServe, SWSetup(swaggerDosc))
 
 //models
-app.use((req:Express.RequestE, res, next) => {
-    req.context = {
-        models,
-        me:"" 
-    }
-})
+// app.use((req:Express.RequestE, res, next) => {
+//     req.context = {
+//         models,
+//         me:"" 
+//     }
+// })
 
 //routes
 

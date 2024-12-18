@@ -48,7 +48,7 @@ export class PswUtils {
   async ValidateOPTN() {}
   async ValidateEmail() {}
 }
-const pureba = new PswUtils(4, "lag")
+// const pureba = new PswUtils(4, "lag")
 
-pureba.OTPNumber().then((j) => console.log(j))
-pureba.prueba()
+// pureba.OTPNumber().then((j) => console.log(j))
+// pureba.prueba()

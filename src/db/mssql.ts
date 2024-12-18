@@ -10,7 +10,7 @@ import {OdenDetalleModel} from './models/orden_detalle'
 import {ProductoModel} from './models/producto'
 import {usuariosModel} from './models/usuarios'
 
-const sequelize = new Sequelize({
+export const sequelize = new Sequelize({
   dialect: MsSqlDialect,
   server: "localhost",
   port: 1433,
@@ -66,5 +66,4 @@ async function SQLServerPing() {
 }
 ;(async () => {
   await sequelize.sync({ alter: false, force: false })
-  await SQLServerPing()
 })()

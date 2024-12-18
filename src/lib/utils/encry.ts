@@ -27,12 +27,10 @@ export async function HassPass(
 export async function ComparePassword(pass: string, hash: string) {
   try {
     const match = await bcrypt.compare(pass, hash)
-    if (match) {
-      console.log("es correcto")
-    } else {
-      console.log("es incorrecta")
-    }
+    console.log(match, pass, hash)
+    return match
   } catch (error) {
     console.error(error)
+    return false
   }
 }
