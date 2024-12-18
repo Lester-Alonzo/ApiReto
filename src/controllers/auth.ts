@@ -5,6 +5,8 @@ import { QueryTypes } from "@sequelize/core"
 import {ComparePassword, HassPass} from '../lib/utils/encry'
 import {PswUtils} from '../lib/utils/OTPswd'
 import type {usuariosAtt} from '../db/models/usuarios'
+import jwt from 'jsonwebtoken'
+import {secreKeyJWT} from '../lib/constants'
 
 const PsU = new PswUtils(4, "fasfafadsf")
 
@@ -21,8 +23,16 @@ export async function Login(req: Request, res: Response) {
     let result = await ComparePassword(pass, resultados.password)
     if(!result) throw new Error("Contrasena incorrecta")
     //TODO: Generar el JWT y el codigo de Session para keydb
-    console.log(resultados, rnumber)
-  res.status(200).json({token:"", error:null})
+  const payload = {
+    idu: resultados.idusuarios,
+    rol: resultados.rol_idrol,
+    estado: resultados.estados_idestados,
+    nombre: resultados.nombre_completo
+  }
+  console.log(payload)
+  const token = jwt.sign(payload, secreKeyJWT, {expiresIn:'5h', algorithm:"HS256"})
+    console.log(resultados, rnumber, token)
+  res.status(200).json({token:token, error:null})
   } catch (error) {
     res.status(404).json({token:null, error:error})
   }
