@@ -45,4 +45,4 @@ export async function UpImage(foto:string) {
   })
 
   console.log(autoCropUrl)
-})()
+})

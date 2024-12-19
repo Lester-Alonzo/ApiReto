@@ -4,6 +4,9 @@ import { serve as SWServe, setup as SWSetup } from "swagger-ui-express"
 import { swaggerDosc } from "../swaggerDef"
 import { auth } from "./routes/auth.route"
 import { producto } from "./routes/producto.route"
+import { rol } from "./routes/rol.route"
+import { estado } from "./routes/estado.route"
+import { CatProdu } from "./routes/categoriaproductos.route"
 // import {models} from './db/mssql'
 // import {Express} from './types'
 
@@ -26,5 +29,8 @@ app.use("/api-docs", SWServe, SWSetup(swaggerDosc))
 
 app.use("/auth", auth)
 app.use("/productos", producto)
+app.use("/rol", rol)
+app.use("/estado", estado)
+app.use("/categoria", CatProdu)
 
 export { app }
