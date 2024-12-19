@@ -9,6 +9,7 @@ import { estado } from "./routes/estado.route"
 import { CatProdu } from "./routes/categoriaproductos.route"
 import { Orden } from "./routes/orden.route"
 import { Clientes } from "./routes/clientes.route"
+import helmet from 'helmet'
 // import {models} from './db/mssql'
 // import {Express} from './types'
 
@@ -17,6 +18,7 @@ const app = express()
 app.use(cors())
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
+app.use(helmet())
 app.use("/api-docs", SWServe, SWSetup(swaggerDosc))
 
 //models
