@@ -8,6 +8,7 @@ import { rol } from "./routes/rol.route"
 import { estado } from "./routes/estado.route"
 import { CatProdu } from "./routes/categoriaproductos.route"
 import { Orden } from "./routes/orden.route"
+import { Clientes } from "./routes/clientes.route"
 // import {models} from './db/mssql'
 // import {Express} from './types'
 
@@ -34,5 +35,6 @@ app.use("/rol", rol)
 app.use("/estado", estado)
 app.use("/categoria", CatProdu)
 app.use("/ordend", Orden)
+app.use("/clientes", Clientes)
 
 export { app }

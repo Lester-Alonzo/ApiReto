@@ -24,13 +24,13 @@ export class PswUtils {
       resolve(returnned)
     })
   }
-  #encrypt(text: string) {
+  encrypt(text: string) {
     const cipher = crypto.createCipheriv(this.#alg, this.#keyText, this.#iv)
     let encrypted = cipher.update(text, "utf8", "hex")
     encrypted += cipher.final("hex")
     return encrypted
   }
-  #decrypt(encryptedData: string) {
+  decrypt(encryptedData: string) {
     const decipher = crypto.createDecipheriv(this.#alg, this.#keyText, this.#iv)
     let decrypted = decipher.update(encryptedData, "hex", "utf8")
     decrypted += decipher.final("utf8")
@@ -40,13 +40,13 @@ export class PswUtils {
     return new Promise((resolve, reject) => {})
   }
   prueba() {
-    const enc = this.#encrypt("Hola a todos")
+    const enc = this.encrypt("Hola a todos")
     console.log(enc)
-    const dec = this.#decrypt(enc)
+    const dec = this.decrypt(enc)
     console.log(dec)
   }
-  async ValidateOPTN() {}
-  async ValidateEmail() {}
+  //async ValidateOPTN() {}
+  //async ValidateEmail() {}
 }
 // const pureba = new PswUtils(4, "lag")
 

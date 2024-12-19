@@ -1,6 +1,6 @@
 import { DataTypes, type Sequelize, Model } from "@sequelize/core"
 
-interface ClientesAtt {
+export interface ClientesAtt {
   idClientes?: number
   razon_social?: string
   nombre_comercial: string

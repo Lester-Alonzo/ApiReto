@@ -59,3 +59,12 @@ export const Orden = z.object({
     subtotal:z.number()
   }))
 })
+
+export const Clientes = z.object({
+  razonsocial:z.string(),
+  nombre: z.string(),
+  direccion: z.string(),
+  telefono:z.string().regex(/^\d{4}-\d{4}$/, "No es la estructura de un telefono"),
+  email:z.string().email(),
+  estado:z.number()
+})
