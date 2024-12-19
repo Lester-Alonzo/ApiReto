@@ -12,7 +12,7 @@ import type { usuariosAtt } from "../db/models/usuarios"
 import { secreKeyJWT } from "../lib/constants"
 import { keyDB } from "../db/keydbConf"
 
-const PsU = new PswUtils(4, "fasfafadsf")
+const PsU = new PswUtils(4, "58a9ffde36ab689dae34")
 
 export async function Login(req: Request, res: Response) {
   const datos = req.body
@@ -39,12 +39,13 @@ export async function Login(req: Request, res: Response) {
       nombre: resultados.nombre_completo,
     }
     const token = jwt.sign(payload, secreKeyJWT, {
-      expiresIn: "5h",
+      expiresIn: "24h",
       algorithm: "HS256",
     })
     //Guardar la session en KeyDB(equivalente a Redis)
     let acceskey = randomUUID()
-    await keyDB.hmset(acceskey, payload)
+    await keyDB.hmset(acceskey, payload, )
+    await keyDB.expire(acceskey, 86400)
     //Se setea un header con la key de KeyDB
     res.cookie("sessionKey", acceskey, {
       httpOnly: true,
