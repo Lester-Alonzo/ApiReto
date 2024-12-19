@@ -1,5 +1,12 @@
-import {Router} from 'express'
-import {MiddlewareORden, ListAll, ListOne, Authorizacion, ListAllUser, Crear} from '../controllers/ordend'
+import { Router } from "express"
+import {
+  MiddlewareORden,
+  ListAll,
+  ListOne,
+  Authorizacion,
+  ListAllUser,
+  Crear,
+} from "../controllers/ordend"
 
 const Orden = Router()
 
@@ -11,4 +18,4 @@ Orden.post("/crear", Crear)
 Orden.get("/orders", ListAllUser)
 Orden.get("/order/:orderid", ListOne)
 
-export {Orden}
+export { Orden }

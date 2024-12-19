@@ -1,14 +1,14 @@
 import { v2 as cloudinary } from "cloudinary"
-import {APISCRET} from '../constants'
+import { APISCRET } from "../constants"
 
 cloudinary.config({
-    cloud_name: "dcm54qy2k",
-    api_key: "693929191313383",
-    api_secret: APISCRET, // Click 'View API Keys' above to copy your API secret
-  })
-export async function UpImage(foto:string) {
-  const result = await cloudinary.uploader.upload(foto,{
-    folder:"fotos"
+  cloud_name: "dcm54qy2k",
+  api_key: "693929191313383",
+  api_secret: APISCRET, // Click 'View API Keys' above to copy your API secret
+})
+export async function UpImage(foto: string) {
+  const result = await cloudinary.uploader.upload(foto, {
+    folder: "fotos",
   })
   return result.secure_url
 }

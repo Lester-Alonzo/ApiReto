@@ -44,7 +44,7 @@ export async function Login(req: Request, res: Response) {
     })
     //Guardar la session en KeyDB(equivalente a Redis)
     let acceskey = randomUUID()
-    await keyDB.hmset(acceskey, payload, )
+    await keyDB.hmset(acceskey, payload)
     await keyDB.expire(acceskey, 86400)
     //Se setea un header con la key de KeyDB
     res.cookie("sessionKey", acceskey, {

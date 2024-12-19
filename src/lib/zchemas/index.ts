@@ -44,27 +44,33 @@ export const Producto = z.object({
 
 export const Orden = z.object({
   pedido: z.object({
-    estado:z.number(),
-    nombreCom:z.string(),
-    direccion:z.string(),
-    telefono:z.string().regex(/^\d{4}-\d{4}$/, "No es la estructura de un telefono"),
-    correo:z.string().email("No es un email"),
+    estado: z.number(),
+    nombreCom: z.string(),
+    direccion: z.string(),
+    telefono: z
+      .string()
+      .regex(/^\d{4}-\d{4}$/, "No es la estructura de un telefono"),
+    correo: z.string().email("No es un email"),
     total: z.number(),
-    cliente:z.number()
+    cliente: z.number(),
   }),
-  articulos: z.array(z.object({
-    pid:z.number(),
-    cantidad: z.number(),
-    precio: z.number(),
-    subtotal:z.number()
-  }))
+  articulos: z.array(
+    z.object({
+      pid: z.number(),
+      cantidad: z.number(),
+      precio: z.number(),
+      subtotal: z.number(),
+    }),
+  ),
 })
 
 export const Clientes = z.object({
-  razonsocial:z.string(),
+  razonsocial: z.string(),
   nombre: z.string(),
   direccion: z.string(),
-  telefono:z.string().regex(/^\d{4}-\d{4}$/, "No es la estructura de un telefono"),
-  email:z.string().email(),
-  estado:z.number()
+  telefono: z
+    .string()
+    .regex(/^\d{4}-\d{4}$/, "No es la estructura de un telefono"),
+  email: z.string().email(),
+  estado: z.number(),
 })

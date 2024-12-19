@@ -1,5 +1,10 @@
-import {Router} from 'express'
-import {CreateEstado,EditarEstado,TodosLosEstados, MiddlewareEstado} from '../controllers/estado'
+import { Router } from "express"
+import {
+  CreateEstado,
+  EditarEstado,
+  TodosLosEstados,
+  MiddlewareEstado,
+} from "../controllers/estado"
 
 const estado = Router()
 
@@ -9,4 +14,4 @@ estado.get("/all", TodosLosEstados)
 estado.post("/crear", CreateEstado)
 estado.put("/editar/:id", EditarEstado)
 
-export {estado}
+export { estado }
