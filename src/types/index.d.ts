@@ -10,10 +10,10 @@ declare namespace Express {
   }
   export interface RequestS extends Request {
     session?: {
-      idu: number,
-      rol: number,
-      estado: number,
-      nombre: string,
+      idu: number
+      rol: number
+      estado: number
+      nombre: string
     }
   }
 }

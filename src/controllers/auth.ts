@@ -44,7 +44,7 @@ export async function Login(req: Request, res: Response) {
     })
     //Guardar la session en KeyDB(equivalente a Redis)
     let acceskey = randomUUID()
-    await keyDB.hmset(acceskey, payload )
+    await keyDB.hmset(acceskey, payload)
     //Se setea un header con la key de KeyDB
     res.cookie("sessionKey", acceskey, {
       httpOnly: true,
@@ -73,7 +73,7 @@ export async function Register(req: Request, res: Response) {
           telefono,
           nombre_completo: nombre,
         },
-        type:QueryTypes.RAW
+        type: QueryTypes.RAW,
       },
     )
     console.log(reusltados)
@@ -135,7 +135,7 @@ export async function ChanginPass(req: Request, res: Response) {
           Campo: "password",
           NuevoValor: passH,
         },
-        type:QueryTypes.RAW
+        type: QueryTypes.RAW,
       },
     )
     res.status(200).json({})
