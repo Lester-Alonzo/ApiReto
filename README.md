@@ -16,6 +16,15 @@ Esta api esta disenada para las necesidades de Mi Tiendita Online.
 - Requerimientos: **SQLServer 2019**, **Keydb**
 ---
 
+### Correr Dependencias
+
+
+```bash
+  docker run -e "ACCEPT_EULA=Y" -e "MSSQL_SA_PASSWORD=Reto360@"  -p 1433:1433  --name sqlServer --hostname sqlServer -d mcr.microsoft.com/mssql/server:2019-latest
+  docker run --name some-keydb -dp 6379:6379 docker.io/eqalpha/keydb
+```
+
+
 > Viendo la reunion del 10/12/2024 se toco el tema del ORM y que los CRUD y funciones se arian mediante los procedure de la DB, cree los modelos y un esquema rapido de relaciones que no utilice, pero los deje ya que como cualquier proyecto que quiera escalar, se podria necesitar en el futuro.
 
 ## Rutas:
@@ -45,12 +54,5 @@ Utilizando directamente el repositorio
   #Modo Produccion
   npm run build
   npm run start
-```
-
-~### Opcion 2:~
-
-
-```bash
-    docker build .
 ```
 
