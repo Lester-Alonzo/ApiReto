@@ -5,7 +5,7 @@ const swaggerDefinition = {
     info: {
       title: "Ecomerce Api",
       version: "1.0.0",
-      description: "Api para un ecomerce",
+      description: "Api Reto360",
     },
     servers: [
       {
