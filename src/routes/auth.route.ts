@@ -12,72 +12,6 @@ const auth = Router()
 
 /**
  * @swagger
- * /auth/login:
- *   post:
- *     summary: En esta ruta hacen login los admins
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             required:
- *               - email
- *               - pass
- *             properties:
- *               email:
- *                 type: string
- *                 description: Correo electrónico del administrador.
- *                 example: admin@example.com
- *               pass:
- *                 type: string
- *                 description: Contraseña del administrador
- *                 example: Desafio360@
- *     responses:
- *       200:
- *         description: Inicio de sesión exitoso. Regresa el token.
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 token:
- *                   type: string
- *                   description: Token JWT para autenticación.
- *       400:
- *         description: Datos de entrada inválidos o faltantes.
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 error:
- *                   type: string
- *                   description: Mensaje de error.
- *       401:
- *         description: Credenciales inválidas.
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 error:
- *                   type: string
- *                   description: Mensaje de error.
- *       500:
- *         description: Error interno del servidor.
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 error:
- *                   type: string
- *                   description: Mensaje de error.
- */
-auth.post("/login", Login)
-/**
- * @swagger
  * /auth/register:
  *   post:
  *     summary: Ruta para crear Admins
@@ -163,6 +97,72 @@ auth.post("/login", Login)
  */
 auth.post("/register", Register)
 
+/**
+ * @swagger
+ * /auth/login:
+ *   post:
+ *     summary: En esta ruta hacen login los admins
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - email
+ *               - pass
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 description: Correo electrónico del administrador.
+ *                 example: admin@example.com
+ *               pass:
+ *                 type: string
+ *                 description: Contraseña del administrador
+ *                 example: Desafio360@
+ *     responses:
+ *       200:
+ *         description: Inicio de sesión exitoso. Regresa el token.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 token:
+ *                   type: string
+ *                   description: Token JWT para autenticación.
+ *       400:
+ *         description: Datos de entrada inválidos o faltantes.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   description: Mensaje de error.
+ *       401:
+ *         description: Credenciales inválidas.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   description: Mensaje de error.
+ *       500:
+ *         description: Error interno del servidor.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   description: Mensaje de error.
+ */
+auth.post("/login", Login)
 /**
  * @swagger
  * /auth/change_password:
