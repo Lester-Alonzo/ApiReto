@@ -47,7 +47,7 @@ export async function TodosLosEstados(req: Request, res: Response) {
 export async function CreateEstado(req: Request, res: Response) {
   const { nombre } = req.body
   try {
-    let rs = await sequelize.query(`EXEC CrearEstado :nombre`, {
+    let rs = await sequelize.query(`EXEC CrearEstados :nombre`, {
       replacements: {
         nombre,
       },

@@ -103,12 +103,27 @@ export async function CraerProducto(
 }
 export async function UpdateProduct(req: Express.RequestS, res: Response) {
   const { id } = req.params
-  const data = req.body
+  //data = [{campo:string, valor:any}=]
+  const {data} = req.body
   try {
-    await sequelize.query(`EXEC ActualizarProducto :id, :Campo, :NuevoValor`, {
-      replacements: {
-        id,
-      },
+    const transaction = await sequelize.transaction(async (t) => {
+      try {
+      for (const element of data) {
+      await sequelize.query(`EXEC ActualizarCampoProducto :id, :Campo, :NuevoValor`, {
+        replacements: {
+          id,
+          Campo: element.campo,
+          NuevoValor: element.nval
+        },
+        type:QueryTypes.RAW,
+        transaction:t
+    })
+      }
+      await t.commit()
+      } catch (error) {
+        await t.rollback()
+        console.log("Error en la transaccion")
+      }
     })
   } catch (error) {
     console.error(error)

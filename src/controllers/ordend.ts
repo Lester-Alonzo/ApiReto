@@ -101,6 +101,7 @@ export async function Authorizacion(req: Express.RequestS, res: Response) {
   const { useid } = req.body
   try {
     const [q1, q2] = await Promise.all([
+      //se coloca el id del usuario admin que autorizo el pedido
       await sequelize.query(
         `
             EXEC ActualizarCampoOrden :id, :campo, :nval
@@ -113,6 +114,7 @@ export async function Authorizacion(req: Express.RequestS, res: Response) {
           },
         },
       ),
+      //se agrega la fecha de entrega
       await sequelize.query(
         `
             EXEC ActualizarCampoOrden :id, :campo, :nval

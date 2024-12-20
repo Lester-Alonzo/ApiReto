@@ -7,3 +7,6 @@ export const secreKeyJWT =
 
 export const APISCRET = `JfGZqclkFj39KVR5uXag8D3sblU`
 export const URLCLo = `cloudinary://693929191313383:JfGZqclkFj39KVR5uXag8D3sblU@dcm54qy2k`
+
+export const DBPASS = "Reto360@"
+export const DBUSER = "sa"

@@ -9,6 +9,7 @@ import { OrdenModel } from "./models/orden"
 import { OdenDetalleModel } from "./models/orden_detalle"
 import { ProductoModel } from "./models/producto"
 import { usuariosModel } from "./models/usuarios"
+import {DBPASS, DBUSER} from '../lib/constants'
 
 export const sequelize = new Sequelize({
   dialect: MsSqlDialect,
@@ -18,8 +19,8 @@ export const sequelize = new Sequelize({
   authentication: {
     type: "default",
     options: {
-      userName: "sa",
-      password: "L@grasaesgrasa2025", //TODO:Cambiar Contrasena
+      userName: DBUSER,
+      password: DBPASS,
     },
   },
   encrypt: true,

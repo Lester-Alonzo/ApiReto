@@ -80,7 +80,7 @@ export async function Crear(req: Express.RequestS, res: Response) {
       Clientes.parse(data)
     await sequelize.query(
       `
-            EXEC CrearCliente :razon, :nombre, :direccion, :telefono, :email, :estado
+            EXEC CrearClientes :razon, :nombre, :direccion, :telefono, :email, :estado
             `,
       {
         replacements: {
@@ -94,8 +94,10 @@ export async function Crear(req: Express.RequestS, res: Response) {
         type: QueryTypes.RAW,
       },
     )
+    res.status(200).json({})
   } catch (error) {
     console.log(error)
+    res.status(400).json({})
   }
 }
 export async function Login(req: Express.RequestS, res: Response) {

@@ -47,10 +47,7 @@ export async function Login(req: Request, res: Response) {
     await keyDB.hmset(acceskey, payload)
     await keyDB.expire(acceskey, 86400)
     //Se setea un header con la key de KeyDB
-    res.cookie("sessionKey", acceskey, {
-      httpOnly: true,
-      maxAge: 18000000,
-    })
+    res.setHeader("session", acceskey)
     res.status(200).json({ token: token, error: null })
   } catch (error) {
     res.status(404).json({ token: null, error: error })

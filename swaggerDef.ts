@@ -1,7 +1,7 @@
 import swaggerJSDoc from "swagger-jsdoc"
 const swaggerDefinition = {
   swaggerDefinition: {
-    myapi: "3.0.0",
+    openapi: "3.0.0",
     info: {
       title: "Ecomerce Api",
       version: "1.0.0",
