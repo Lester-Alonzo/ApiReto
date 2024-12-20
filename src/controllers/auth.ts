@@ -48,7 +48,7 @@ export async function Login(req: Request, res: Response) {
     await keyDB.expire(acceskey, 86400)
     //Se setea un header con la key de KeyDB
     res.setHeader("session", acceskey)
-    res.status(200).json({ token: token, error: null })
+    res.status(200).json({ token: token, session: acceskey,error: null })
   } catch (error) {
     res.status(404).json({ token: null, error: error })
   }
