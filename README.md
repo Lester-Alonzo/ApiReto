@@ -37,8 +37,6 @@ Esta api esta disenada para las necesidades de Mi Tiendita Online.
 - **/ordend(middleware para validar sesion y rol)**: Ruta para crear ordenes, y autorizar las mismas
 - **/clientes(middleware para validar sesion y rol)**: Ruta para el login de clientes, y para la creacion y listarlos
 
-> _.env_: no se incluyo en este sprint ya que para motivos de evaluacion es mas comodo trabajar con CONSTANTS, en el producto final de produccion se implementaran los .env tanto en el back como en el front
-
 
 ## Ejecutar Proyecto:
 
@@ -48,7 +46,7 @@ Utilizando directamente el repositorio
 
 ```bash
   #Modo dev
-    git clone <git:url>
+    git clone https://github.com/Lester-Alonzo/ApiReto.git
     npm i
     npm run dev
   #Modo Produccion
@@ -56,3 +54,4 @@ Utilizando directamente el repositorio
   npm run start
 ```
 
+~Opcion 2~: pendiente correr con DockerCompose
