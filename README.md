@@ -13,17 +13,16 @@ Esta api esta disenada para las necesidades de Mi Tiendita Online.
 
 ## Rutas:
 
-- /auth: Ruta para el manejo de seguridad, sesiones y usuarios
-  - /auth/login
-  - /auth/register
-  - /auth/change_password
-  - /auth/confirm_email/:user_hash
-  - /auth/verify_session
-- /productos: Ruta para administrar los productos de la empresa
-  - /productos/crear
-  - /productos/editar/:id
-  - /productos/eliminar/:id
-  - /productos/?page=""&?tags=""&?filtros=""
+- /auth: Ruta para el manejo de seguridad, sesiones y Admins
+- /productos(middleware para validar sesion y rol): Ruta para administrar los productos de la empresa
+- /estado(middleware para validar sesion y rol): Rutapara administrar los estados
+- /rol(middleware para validar sesion y rol): Ruta para administrar los roles
+- /categoria(middleware para validar sesion y rol): Ruta para administrar las categorias
+- /ordend(middleware para validar sesion y rol): Ruta para crear ordenes, y autorizar las mismas
+- /clientes(middleware para validar sesion y rol): Ruta para el login de clientes, y para la creacion y listarlos
+
+> _.env_: no se incluyo en este sprint ya que para motivos de calificacion es mas comodo trabajar con CONSTANTS, en el producto final de produccion se implementaran los .env tanto en el back como en el front
+
 
 ## Ejecutar Proyecto:
 
@@ -32,15 +31,13 @@ Esta api esta disenada para las necesidades de Mi Tiendita Online.
 Utilizando directamente el repositorio
 
 ```bash
+  #Modo dev
     git clone <git:url>
     npm i
     npm run dev
-```
-
-_.env_
-
-```
-    MSQL_SERVER_URL="<url de la base de datos>"
+  #Modo Produccion
+  npm run build
+  npm run start
 ```
 
 ### Opcion 2:
