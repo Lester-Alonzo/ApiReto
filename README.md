@@ -6,7 +6,8 @@
 ![Docker](https://img.shields.io/badge/Docker-2CA5E0?style=for-the-badge&logo=docker&logoColor=white)
 
 ---
-
+**Participante Clave:** _GDA00465-OT_ **Grupo**: B
+---
 Esta api esta disenada para las necesidades de Mi Tiendita Online.
 
 > Viendo la reunion del 10/12/2024 se toco el tema del ORM y que los CRUD y funciones se arian mediante los procedure de la DB, cree los modelos y un esquema rapido de relaciones que no utilice, pero los deje ya que como cualquier proyecto que quiera escalar, se podria necesitar en el futuro.
