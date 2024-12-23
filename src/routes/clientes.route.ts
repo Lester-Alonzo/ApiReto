@@ -9,7 +9,6 @@ import {
 
 const Clientes = Router()
 
-Clientes.use(MiddlewareClientes)
 
 /**
  * @swagger
@@ -63,7 +62,7 @@ Clientes.use(MiddlewareClientes)
  *                   type: string
  *                   description: Mensaje de error.
  */
-Clientes.get("/all", TodosLosClientes)
+Clientes.get("/all", MiddlewareClientes, TodosLosClientes)
 
 /**
  * @swagger
@@ -217,6 +216,6 @@ Clientes.get("/confirmlogin/:key", ConfirmLogin)
  *                   type: string
  *                   description: Mensaje de error.
  */
-Clientes.post("/crear", Crear)
+Clientes.post("/crear", MiddlewareClientes, Crear)
 
 export { Clientes }
