@@ -12,6 +12,58 @@ const Orden = Router()
 
 Orden.use(MiddlewareORden)
 
+/**
+ * @swagger
+ * /ordend/all:
+ *   get:
+ *     summary: Muestra todas las ordenes
+ *     parameters:
+ *       - in: header
+ *         name: session
+ *         schema:
+ *           type: string
+ *         description: Token de sesión del usuario (ingresar manualmente)
+ *     responses:
+ *       200:
+ *         description: Se muestra una lista de todas las ordenes.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items: 
+ *                 type: object
+ *                 description: Estados
+ *       400:
+ *         description: Datos de entrada inválidos o faltantes.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   description: Mensaje de error.
+ *       401:
+ *         description: No autorizado. Se requiere token de sesión o es inválido.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   description: Mensaje de error.
+ *       500:
+ *         description: Error interno del servidor.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   description: Mensaje de error.
+ */
 Orden.get("/all", ListAll)
 Orden.post("/autorizar/:id", Authorizacion)
 Orden.post("/crear", Crear)
