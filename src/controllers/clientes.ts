@@ -7,6 +7,7 @@ import { Clientes } from "../lib/zchemas"
 import { secreKeyJWT } from "../lib/constants"
 import jwt from "jsonwebtoken"
 import { PswUtils } from "../lib/utils/OTPswd"
+import {SendEmail} from '../lib/mail'
 
 interface Clientes {
   idClientes?: number
@@ -126,6 +127,7 @@ export async function Login(req: Express.RequestS, res: Response) {
     let rund = crypto.randomUUID()
     let url = `${req.protocol}://${req.host}${req.baseUrl}/confirmlogin/${rund}`
     await keyDB.set(rund, hassed)
+    await SendEmail(resultado.email, resultado.nombre_comercial, {asunto:"Login en la app", body:`<a href="${url}">Confirmar Login</a>`})
     res.status(200).json({ url })
   } catch (error) {
     console.error(error)
