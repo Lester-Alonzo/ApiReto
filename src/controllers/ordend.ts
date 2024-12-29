@@ -170,6 +170,7 @@ export async function Crear(req: Express.RequestS, res: Response) {
   try {
     const { articulos, pedido } = Orden.parse(data)
     const resultado = await sequelize.transaction(async (t) => {
+      try {
       const nuevoPedido = await sequelize.query(
         `
                 EXEC CrearOrdenes NULL, :estadoID, :nombreCompleto, :direccion, :telefono, :correo_electronico, :total_orden, :cliente;
@@ -208,7 +209,11 @@ export async function Crear(req: Express.RequestS, res: Response) {
           },
         )
       }
+      await t.commit()
       return nuevoPedido
+      } catch (error) {
+        await t.rollback()
+      }
     })
     console.log(resultado)
     res.status(200).json({})
