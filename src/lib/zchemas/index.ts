@@ -34,12 +34,12 @@ export const PassVal = z
   .regex(/[\W_]/, "La contraseña debe contener por lo menos 1 simbolo")
 
 export const Producto = z.object({
-  categoria: z.number(),
+  categoria: z.string(),
   nombre: z.string(),
   marca: z.string(),
-  stock: z.number(),
-  estado: z.number(),
-  precion: z.number(),
+  stock: z.string(),
+  estado: z.string(),
+  precion: z.string(),
 })
 
 export const Orden = z.object({

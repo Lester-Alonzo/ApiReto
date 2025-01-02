@@ -2,7 +2,6 @@ IF NOT EXISTS (SELECT * FROM sys.databases WHERE name = 'EcomerceV3')
 BEGIN
 	CREATE DATABASE EcomerceV3;
 END;
-
 USE EcomerceV3;
 -- Creación de tablas
 CREATE TABLE rol (
@@ -81,6 +80,7 @@ CREATE TABLE Orden (
     correo_electronico VARCHAR(70) NOT NULL,
     fecha_entrega DATE NULL,
     total_orden FLOAT NOT NULL,
+    completado BIT DEFAULT 0,
     FOREIGN KEY (usuarios_idusuarios) REFERENCES usuarios(idusuarios),
     FOREIGN KEY (estados_idestados) REFERENCES estados(idestados),
     FOREIGN KEY (client_idClient) REFERENCES Clientes(idClientes)
@@ -130,6 +130,45 @@ BEGIN
         FROM DELETED d;
     END
 END;
+
+-- Trigger para actualizar el stock de productos al autorizar una orden (modificado)
+CREATE TRIGGER trg_ActualizarStockAlAutorizarOrden
+ON Orden
+AFTER UPDATE
+AS
+BEGIN
+    -- Verificar si la columna usuarios_idusuarios ha cambiado a un valor diferente de NULL
+    IF UPDATE(usuarios_idusuarios) AND EXISTS (SELECT 1 FROM inserted WHERE usuarios_idusuarios IS NOT NULL)
+    BEGIN
+        -- Recorrer los detalles de la orden que se está autorizando
+        DECLARE @idOrden INT;
+        SELECT @idOrden = idOrden FROM inserted;
+
+        DECLARE @Productos_idProductos INT;
+        DECLARE @cantidad INT;
+        DECLARE cursor_orden CURSOR FOR
+        SELECT Productos_idProductos, cantidad
+        FROM OrdenDetalles
+        WHERE Orden_idOrden = @idOrden;
+
+        OPEN cursor_orden;
+        FETCH NEXT FROM cursor_orden INTO @Productos_idProductos, @cantidad;
+
+        WHILE @@FETCH_STATUS = 0
+        BEGIN
+            -- Actualizar el stock del producto
+            UPDATE Productos
+            SET stock = stock - @cantidad
+            WHERE idProductos = @Productos_idProductos;
+
+            FETCH NEXT FROM cursor_orden INTO @Productos_idProductos, @cantidad;
+        END
+
+        CLOSE cursor_orden;
+        DEALLOCATE cursor_orden;
+    END
+END;
+
 
 
 -- Procedimientos almacenados

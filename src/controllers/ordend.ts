@@ -54,7 +54,7 @@ export async function ListAll(req: Express.RequestS, res: Response) {
             INNER JOIN
             OrdenDetalles d ON o.idOrden = d.Orden_idOrden
             GROUP BY
-                o.idOrden, o.usuarios_idusuarios, o.estados_idestados, o.client_idClient, o.fecha_creacion, o.nombre_completo, o.direccion, o.telefono, o.correo_electronico, o.fecha_entrega, o.total_orden
+                o.idOrden, o.usuarios_idusuarios, o.estados_idestados, o.client_idClient, o.fecha_creacion, o.nombre_completo, o.direccion, o.telefono, o.correo_electronico, o.fecha_entrega, o.total_orden, o.completado
             `,
       {
         type: QueryTypes.SELECT,
@@ -74,7 +74,8 @@ export async function ListOne(req: Express.RequestS, res: Response) {
       `SELECT 
             d.cantidad,
             d.precio,
-            p.nombre
+            p.nombre,
+            p.stock
             FROM 
             orden o 
             INNER JOIN 
@@ -98,7 +99,6 @@ export async function ListOne(req: Express.RequestS, res: Response) {
 }
 export async function Authorizacion(req: Express.RequestS, res: Response) {
   const { id } = req.params
-  const { useid } = req.body
   try {
     const [q1, q2] = await Promise.all([
       //se coloca el id del usuario admin que autorizo el pedido
@@ -110,7 +110,7 @@ export async function Authorizacion(req: Express.RequestS, res: Response) {
           replacements: {
             id,
             campo: "usuarios_idusuarios",
-            nval: useid,
+            nval: req.session?.idu,
           },
         },
       ),
@@ -171,46 +171,45 @@ export async function Crear(req: Express.RequestS, res: Response) {
     const { articulos, pedido } = Orden.parse(data)
     const resultado = await sequelize.transaction(async (t) => {
       try {
-      const nuevoPedido = await sequelize.query(
-        `
+        const nuevoPedido = await sequelize.query(
+          `
                 EXEC CrearOrdenes NULL, :estadoID, :nombreCompleto, :direccion, :telefono, :correo_electronico, :total_orden, :cliente;
                 `,
-        {
-          replacements: {
-            estadoID: pedido.estado,
-            nombreCompleto: pedido.nombreCom,
-            direccion: pedido.direccion,
-            telefono: pedido.telefono,
-            correo_electronico: pedido.correo,
-            total_orden: pedido.total,
-            cliente: pedido.cliente,
-          },
-          type: QueryTypes.RAW,
-          transaction: t,
-        },
-      )
-      const idPedido = (nuevoPedido[0][0] as any).IdPedido
-
-      for (const element of articulos) {
-        await sequelize.query(
-          `
-                EXEC CrearOrdenDetalles :ordenid, :productoid, :cantidad, :precio, :subtotal
-                    `,
           {
             replacements: {
-              ordenid: idPedido,
-              productoid: element.pid,
-              cantidad: element.cantidad,
-              precio: element.precio,
-              subtotal: element.subtotal,
+              estadoID: pedido.estado,
+              nombreCompleto: pedido.nombreCom,
+              direccion: pedido.direccion,
+              telefono: pedido.telefono,
+              correo_electronico: pedido.correo,
+              total_orden: pedido.total,
+              cliente: pedido.cliente,
             },
             type: QueryTypes.RAW,
             transaction: t,
           },
         )
-      }
-      await t.commit()
-      return nuevoPedido
+        const idPedido = (nuevoPedido[0][0] as any).IdPedido
+
+        for (const element of articulos) {
+          await sequelize.query(
+            `
+                EXEC CrearOrdenDetalles :ordenid, :productoid, :cantidad, :precio, :subtotal
+                    `,
+            {
+              replacements: {
+                ordenid: idPedido,
+                productoid: element.pid,
+                cantidad: element.cantidad,
+                precio: element.precio,
+                subtotal: element.subtotal,
+              },
+              type: QueryTypes.RAW,
+              transaction: t,
+            },
+          )
+        }
+        return nuevoPedido
       } catch (error) {
         await t.rollback()
       }
@@ -220,5 +219,22 @@ export async function Crear(req: Express.RequestS, res: Response) {
   } catch (error) {
     console.error(error)
     res.status(400).json({})
+  }
+}
+export async function Rechazar(req: Express.RequestS, res: Response) {
+  const {id} = req.params
+  let rol = req.session?.rol
+  if(rol !== 1) res.status(403).json({message:"No se cuenta con los suficientes privilegios"})
+  try {
+    let exeCQuery = await sequelize.query(`EXEC InactivarOrden :id, 2`, {
+      replacements:{
+        id
+      },
+      type:QueryTypes.RAW
+    })
+    res.status(200).json({})
+  } catch (error) {
+    console.log(error)
+    res.status(400).json(error)
   }
 }

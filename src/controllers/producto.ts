@@ -70,14 +70,15 @@ export async function CraerProducto(
   req: Express.RequestS,
   res: Response,
 ): Promise<void> {
+  if (!req.file) res.status(400).send("No se ha subido ninguna imagen")
   const datos = req.body
+  console.log(datos)
   try {
-    if (!req.file) res.status(400).send("No se ha subido ninguna imagen")
     const { categoria, estado, marca, nombre, precion, stock } =
       Producto.parse(datos)
-    const fotoUrl = await UpImage(
-      Buffer.from(req.file?.buffer as Buffer).toString("base64"),
-    )
+
+    const fotoUrl = await UpImage(req.file?.buffer as Buffer)
+    console.log(fotoUrl)
     const [resultado] = await sequelize.query(
       `EXEC CrearProductos :CategoriaProductos_IDCategoria, :usuarios_idusuarios, :nombre, :marca, :codigo, :stock, :estados_idestados, :precio, :foto`,
       {
@@ -86,10 +87,10 @@ export async function CraerProducto(
           nombre,
           marca,
           codigo: randomUUID(),
-          stock,
-          estados_idestados: estado,
-          CategoriaProductos_IDCategoria: categoria,
-          precio: precion,
+          stock:Number(stock),
+          estados_idestados: Number(estado),
+          CategoriaProductos_IDCategoria: Number(categoria),
+          precio: Number(precion),
           foto: fotoUrl,
         },
         type: QueryTypes.RAW,
