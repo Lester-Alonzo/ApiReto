@@ -6,6 +6,7 @@ import {
   UpdateProduct,
   MiddlewareProduct,
   EliminarProducto,
+  ActivarProducto,
 } from "../controllers/producto"
 const producto = Router()
 
@@ -71,6 +72,7 @@ producto.post(
   CraerProducto,
 )
 producto.put("/editar/:id", MiddlewareProduct, UpdateProduct)
-producto.delete("eliminar/:id", MiddlewareProduct, EliminarProducto)
+producto.delete("/eliminar/:id", MiddlewareProduct, EliminarProducto)
+producto.put("/activar/:id", MiddlewareProduct, ActivarProducto)
 
 export { producto }

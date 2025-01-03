@@ -238,3 +238,20 @@ export async function Rechazar(req: Express.RequestS, res: Response) {
     res.status(400).json(error)
   }
 }
+
+export async function EntregarOrden(req:Express.RequestS, res:Response) {
+  const {id} = req.params
+  try {
+    let result = await sequelize.query(`EXEC EntregarOrden :id`, {
+      replacements:{
+        id
+        },
+        type:QueryTypes.RAW
+    })
+    res.status(200).json({})
+  } catch (error) {
+    console.log(error)
+    res.status(404).json({})
+    throw error
+  }
+}

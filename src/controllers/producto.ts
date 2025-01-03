@@ -105,7 +105,8 @@ export async function CraerProducto(
 export async function UpdateProduct(req: Express.RequestS, res: Response) {
   const { id } = req.params
   //data = [{campo:string, valor:any}=]
-  const {data} = req.body
+  const data = req.body
+  console.log(data, id)
   try {
     const transaction = await sequelize.transaction(async (t) => {
       try {
@@ -120,34 +121,54 @@ export async function UpdateProduct(req: Express.RequestS, res: Response) {
         transaction:t
     })
       }
-      await t.commit()
+      res.status(200).json({})
       } catch (error) {
-        await t.rollback()
         console.log("Error en la transaccion")
       }
     })
   } catch (error) {
     console.error(error)
     res.status(400).json({})
+    throw error
   }
 }
 
 export async function EliminarProducto(req: Express.RequestS, res: Response) {
   const { id } = req.params
-  const { estado } = req.query
   try {
     let result = await sequelize.query(
-      `EXEC InactivarProductor :idProducto, :idEstado`,
+      `EXEC InactivarProducto :idProducto, :idEstado`,
       {
         replacements: {
           idProducto: id,
-          idEstado: estado,
+          idEstado: 2,
         },
+        type:QueryTypes.RAW
       },
     )
     res.status(200).json(result)
   } catch (err) {
     console.log(err)
-    res.status(404).json({})
+    res.status(404).json({err})
+  }
+}
+
+export async function ActivarProducto(req: Express.RequestS, res: Response) {
+  const { id } = req.params
+  try {
+    let result = await sequelize.query(
+      `EXEC InactivarProducto :idProducto, :idEstado`,
+      {
+        replacements: {
+          idProducto: id,
+          idEstado: 1,
+        },
+        type:QueryTypes.RAW
+      },
+    )
+    res.status(200).json(result)
+  } catch (err) {
+    console.log(err)
+    res.status(404).json({err})
   }
 }
