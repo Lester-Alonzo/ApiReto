@@ -3,6 +3,8 @@ BEGIN
 	CREATE DATABASE EcomerceV3;
 END;
 USE EcomerceV3;
+--USE Master;
+--DROP DATABASE EcomerceV3;
 -- Creación de tablas
 CREATE TABLE rol (
     idrol INT PRIMARY KEY IDENTITY,
@@ -294,6 +296,7 @@ BEGIN
     END
 END;
 
+
 CREATE PROCEDURE InactivarUsuario
     @idUsuario INT,
     @idEstado INT
@@ -419,6 +422,17 @@ BEGIN
     END
 END;
 
+
+
+CREATE PROCEDURE EntregarOrden
+	@idOrden INT
+AS
+BEGIN
+UPDATE Orden
+SET completado = 1
+WHERE idOrden = @idOrden
+END;
+
 CREATE PROCEDURE ActualizarEstado
     @idestados INT,
     @nombre VARCHAR(45)
@@ -437,6 +451,31 @@ BEGIN
         PRINT 'El estado ha sido actualizado correctamente.';
     END
 END;
+
+
+CREATE TRIGGER trg_AfterUpdate_CategoriaProductos
+ON CategoriaProductos
+AFTER UPDATE 
+AS 
+BEGIN
+	UPDATE Productos
+	SET estados_idestados = 2
+	WHERE CategoriaProductos_IDCategoria IN (SELECT idCategoriaProductos FROM inserted)
+	AND estados_idestados = 1
+	AND EXISTS (
+		SELECT 1 FROM inserted WHERE estados_idestados = 2
+	)
+	
+	UPDATE Productos
+	SET estados_idestados = 1
+	WHERE CategoriaProductos_IDCategoria IN (SELECT idCategoriaProductos FROM inserted)
+		AND estados_idestados = 2
+		AND EXISTS  (
+			SELECT 1 FROM inserted WHERE estados_idestados = 1
+		)
+END
+
+
 
 CREATE PROCEDURE ActualizarCategoria
     @idCategoriaProductos INT,
@@ -604,6 +643,7 @@ EXEC CrearCategorias 1, 'Electrónica', 1;
 EXEC CrearProductos 1, 1, 'Laptop', 'MarcaX', 'CODLAP1', 10, 1, 15000, "fasfasfsadfds";
 EXEC CrearProductos 1, 1, 'Smartphone', 'MarcaY', 'CODPH1', 20, 1, 3000, "fadfsafsadfasd";
 EXEC CrearProductos 1, 1, 'Tablet', 'MarcaZ', 'CODTAB1', 5, 1, 5000, "fasfadfafasdfsaf";
+EXEC CrearProductos 1, 1, 'Drone', 'MarcaX', 'CODDRO1', 10, 1, 25000, "https://petapixel.com/assets/uploads/2022/09/what-is-an-fpv-drone.jpg";
 
 
 EXEC CrearOrdenes  NULL, 1, 'Cliente A', 'Direccion A', '11111', 'clienteA@mail.com', 20000, 1;
@@ -704,12 +744,9 @@ SELECT * FROM Productos;
 SELECT * FROM estados;
 SELECT * FROM rol;
 SELECT * FROM usuarios;
-SELECT * FROM orden;
+SELECT * FROM Orden;
 SELECT * FROM OrdenDetalles;
 SELECT * FROM CategoriaProductos;
 SELECT * FROM Clientes;
 SELECT * FROM usuarios WHERE correo_electronico = N'admin@mail.com';
 SELECT * FROM sys.databases;
-
-
-
