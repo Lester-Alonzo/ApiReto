@@ -9,6 +9,8 @@ import jwt from "jsonwebtoken"
 import { PswUtils } from "../lib/utils/OTPswd"
 import {SendEmail} from '../lib/mail'
 
+process.loadEnvFile()
+
 interface Clientes {
   idClientes?: number
   razon_social?: string
@@ -76,8 +78,9 @@ export async function TodosLosClientes(req: Express.RequestS, res: Response) {
 
 export async function Crear(req: Express.RequestS, res: Response) {
   const data = req.body
+  console.log(data)
   try {
-    const { direccion, email, estado, nombre, razonsocial, telefono } =
+    const { direccion, email, nombre, razonsocial, telefono } =
       Clientes.parse(data)
     await sequelize.query(
       `
@@ -89,12 +92,13 @@ export async function Crear(req: Express.RequestS, res: Response) {
           nombre,
           direccion,
           telefono,
-          estado,
+          estado:1,
           email,
         },
         type: QueryTypes.RAW,
       },
     )
+    await SendEmail(email, nombre, {asunto:"Usuario Creado", body:`<h1>Usuario Creado Exitosamente</h1>`})
     res.status(200).json({})
   } catch (error) {
     console.log(error)
@@ -125,7 +129,7 @@ export async function Login(req: Express.RequestS, res: Response) {
       }),
     )
     let rund = crypto.randomUUID()
-    let url = `${req.protocol}://${req.host}${req.baseUrl}/confirmlogin/${rund}`
+    let url = `${process.env.urlfront}confirmlogin/${rund}`
     await keyDB.set(rund, hassed)
     await SendEmail(resultado.email, resultado.nombre_comercial, {asunto:"Login en la app", body:`<a href="${url}">Confirmar Login</a>`})
     res.status(200).json({ url })
@@ -136,6 +140,7 @@ export async function Login(req: Express.RequestS, res: Response) {
 }
 export async function ConfirmLogin(req: Express.RequestS, res: Response) {
   const { key } = req.params
+  console.log(key)
   try {
     if (!key || (await keyDB.exists(key)) === 0)
       throw new Error("Llave erronea")
@@ -156,12 +161,75 @@ export async function ConfirmLogin(req: Express.RequestS, res: Response) {
     await keyDB.hmset(acceskey, payload)
     await keyDB.expire(acceskey, 86400)
     //Se setea un header con la key de KeyDB
-    res.cookie("sessionKey", acceskey, {
-      httpOnly: true,
-      maxAge: 18000000,
-    })
-    res.status(200).json({ token: token, error: null })
+    res.status(200).json({ token: token, error: null, session:acceskey })
   } catch (err) {
     console.log(err)
+  }
+}
+
+export async function EliminarCliente(req:Express.RequestS, res:Response) {
+  const {id} = req.params
+  try {
+    const [] = await sequelize.query(`EXEC InactivarCliente :cliente, :estado `, {
+      replacements: {
+        cliente: id,
+        estado: 2
+      },
+      type:QueryTypes.RAW
+    })
+    res.status(200).json({})
+  } catch (error) {
+    console.log(error)
+    res.status(400).json({})
+    throw error
+  }
+}
+
+export async function ActivarCliente(req:Express.RequestS, res:Response) {
+  const {id} = req.params
+  try {
+    const [] = await sequelize.query(`EXEC InactivarCliente :cliente, :estado `, {
+      replacements: {
+        cliente: id,
+        estado: 1
+      },
+      type:QueryTypes.RAW
+    })
+    res.status(200).json({})
+  } catch (error) {
+    console.log(error)
+    res.status(400).json({})
+    throw error
+  }
+}
+
+export async function UpdateCliente(req:Express.RequestS, res:Response) {
+   const { id } = req.params
+  //data = [{campo:string, valor:any}=]
+  const data = req.body
+  console.log(data, id)
+  try {
+    const transaction = await sequelize.transaction(async (t) => {
+      try {
+      for (const element of data) {
+      await sequelize.query(`EXEC ActualizarCampoClientes :id, :Campo, :NuevoValor`, {
+        replacements: {
+          id,
+          Campo: element.campo,
+          NuevoValor: element.nval
+        },
+        type:QueryTypes.RAW,
+        transaction:t
+    })
+      }
+      res.status(200).json({})
+      } catch (error) {
+        console.log("Error en la transaccion")
+      }
+    })
+  } catch (error) {
+    console.error(error)
+    res.status(400).json({})
+    throw error
   }
 }

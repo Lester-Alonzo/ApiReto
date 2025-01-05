@@ -7,7 +7,8 @@ import {
   ListAllUser,
   Crear,
   Rechazar,
-  EntregarOrden
+  EntregarOrden,
+  GetOne
 } from "../controllers/ordend"
 
 const Orden = Router()
@@ -67,6 +68,7 @@ Orden.use(MiddlewareORden)
  *                   description: Mensaje de error.
  */
 Orden.get("/all", ListAll)
+Orden.get("/one/:id",GetOne)
 Orden.get("/autorizar/:id", Authorizacion)
 Orden.get("/rechazar/:id", Rechazar)
 Orden.post("/crear", Crear)

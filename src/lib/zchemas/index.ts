@@ -15,8 +15,6 @@ export const Credentials = z.object({
     )
     .regex(/[0-9]/, "La contraseña debe contener por lo menos 1 numero")
     .regex(/[\W_]/, "La contraseña debe contener por lo menos 1 simbolo"),
-  rol: z.number({ message: "No es un id valido" }),
-  estado: z.number({ message: "No es un id valido" }),
   telefono: z.string().regex(/^\d{4}-\d{4}$/),
   nombre: z.string({ message: "Tiene que ser un nombre completo" }),
 })
@@ -72,5 +70,4 @@ export const Clientes = z.object({
     .string()
     .regex(/^\d{4}-\d{4}$/, "No es la estructura de un telefono"),
   email: z.string().email(),
-  estado: z.number(),
 })

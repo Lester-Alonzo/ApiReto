@@ -1,10 +1,13 @@
 import { Router } from "express"
 import {
+  ActivarCliente,
   ConfirmLogin,
   Crear,
+  EliminarCliente,
   Login,
   MiddlewareClientes,
   TodosLosClientes,
+  UpdateCliente,
 } from "../controllers/clientes"
 
 const Clientes = Router()
@@ -217,5 +220,7 @@ Clientes.get("/confirmlogin/:key", ConfirmLogin)
  *                   description: Mensaje de error.
  */
 Clientes.post("/crear", MiddlewareClientes, Crear)
-
+Clientes.delete("/eliminar/:id", EliminarCliente)
+Clientes.get("/activar/:id", ActivarCliente)
+Clientes.put("/actualizar/:id", UpdateCliente)
 export { Clientes }

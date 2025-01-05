@@ -255,3 +255,33 @@ export async function EntregarOrden(req:Express.RequestS, res:Response) {
     throw error
   }
 }
+
+export async function GetOne(req: Express.RequestS, res: Response) {
+  const {id} = req.params
+  try {
+    let result = await sequelize.query(
+      `
+            SELECT 
+            o.*,
+            COUNT(d.idOrdenDetalles) AS Cantidad_Productos
+            FROM 
+            orden o
+            INNER JOIN
+            OrdenDetalles d ON o.idOrden = d.Orden_idOrden
+            WHERE o.client_idClient = :id
+            GROUP BY
+                o.idOrden, o.usuarios_idusuarios, o.estados_idestados, o.client_idClient, o.fecha_creacion, o.nombre_completo, o.direccion, o.telefono, o.correo_electronico, o.fecha_entrega, o.total_orden, o.completado
+            `,
+      {
+        replacements:{
+          id
+        },
+        type: QueryTypes.SELECT,
+      },
+    )
+    res.status(200).json(result)
+  } catch (error) {
+    console.log(error)
+    res.status(400).json({})
+  }
+}

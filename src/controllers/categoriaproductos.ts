@@ -46,7 +46,7 @@ export async function TodosLosCP(req: Request, res: Response) {
 }
 
 export async function CrearCategoria(req: Express.RequestS, res: Response) {
-  const { nombre, estado } = req.body
+  const { nombre } = req.body
   try {
     let rs = await sequelize.query(
       `EXEC CrearCategorias :usuarios_idusuarios, :nombre, :estados_idestados`,
@@ -54,13 +54,14 @@ export async function CrearCategoria(req: Express.RequestS, res: Response) {
         replacements: {
           usuarios_idusuarios: req.session?.idu,
           nombre,
-          estados_idestados: estado,
+          estados_idestados: 1,
         },
         type: QueryTypes.RAW,
       },
     )
     res.status(200).json({})
   } catch (error) {
+    console.log(error)
     res.status(400).json({})
   }
 }
