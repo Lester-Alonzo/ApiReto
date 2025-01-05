@@ -4,10 +4,14 @@ import {
   ConfirmLogin,
   Crear,
   EliminarCliente,
+  GetCart,
   Login,
+  MiddlewareCliente,
   MiddlewareClientes,
+  SetCart,
   TodosLosClientes,
   UpdateCliente,
+  VerifyUser,
 } from "../controllers/clientes"
 
 const Clientes = Router()
@@ -129,7 +133,7 @@ Clientes.get("/all", MiddlewareClientes, TodosLosClientes)
  */
 Clientes.post("/login", Login)
 // esta se ejecuta mejor en el navegador y al final cuando este el Front va a hacer login directamente
-Clientes.get("/confirmlogin/:key", ConfirmLogin)
+Clientes.get("/confirmlogin/:key", MiddlewareCliente,ConfirmLogin)
 
 /**
  * @swagger
@@ -223,4 +227,7 @@ Clientes.post("/crear", MiddlewareClientes, Crear)
 Clientes.delete("/eliminar/:id", EliminarCliente)
 Clientes.get("/activar/:id", ActivarCliente)
 Clientes.put("/actualizar/:id", UpdateCliente)
+Clientes.get("/virify", MiddlewareCliente,VerifyUser)
+Clientes.post("/cart", MiddlewareCliente,SetCart)
+Clientes.get("/cart", MiddlewareCliente,GetCart)
 export { Clientes }

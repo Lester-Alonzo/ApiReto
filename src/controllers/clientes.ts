@@ -40,7 +40,43 @@ export async function MiddlewareClientes(
     if (
       Number(tokenVal.rol) !== 1 &&
       req.originalUrl.includes("all") &&
-      req.originalUrl.includes("crear")
+      req.originalUrl.includes("crear") &&
+      Number(tokenVal.estado) === 2
+    ) {
+      res.status(406).json({ message: "No tienes los suficientes privilegios" })
+    }
+
+    req.session = {
+      estado: Number(tokenVal.estado),
+      idu: Number(tokenVal.idu),
+      nombre: tokenVal.nombre,
+      rol: Number(tokenVal.rol),
+    }
+
+    next()
+  } catch (error) {
+    console.error(error)
+    res.status(500).json({ message: "Error en el servidor" })
+  }
+}
+export async function MiddlewareCliente(
+  req: Express.RequestS,
+  res: Response,
+  next: NextFunction,
+): Promise<void> {
+  try {
+    let sessionToken = req.headers["session"] as string
+    if (!(await keyDB.exists(sessionToken))) {
+      res.status(405).json({ message: "Error con la session" })
+    }
+
+    let tokenVal = await keyDB.hgetall(sessionToken)
+    console.log(tokenVal)
+
+    if (
+      req.originalUrl.includes("all") &&
+      req.originalUrl.includes("crear") &&
+      Number(tokenVal.estado) === 2
     ) {
       res.status(406).json({ message: "No tienes los suficientes privilegios" })
     }
@@ -66,6 +102,25 @@ export async function TodosLosClientes(req: Express.RequestS, res: Response) {
             SELECT * FROM Clientes;
             `,
       {
+        type: QueryTypes.SELECT,
+      },
+    )
+    res.status(200).json(result)
+  } catch (err) {
+    console.log(err)
+    res.status(400).json({})
+  }
+}
+export async function VerifyUser(req: Express.RequestS, res: Response) {
+  try {
+    let result = await sequelize.query(
+      `
+            SELECT * FROM Clientes WHERE idClientes = :id ;
+            `,
+      {
+        replacements: {
+          id: req.session?.idu
+        },
         type: QueryTypes.SELECT,
       },
     )
@@ -231,5 +286,30 @@ export async function UpdateCliente(req:Express.RequestS, res:Response) {
     console.error(error)
     res.status(400).json({})
     throw error
+  }
+}
+
+export async function SetCart(req:Express.RequestS, res:Response) {
+  const data = req.body
+  let uid = req.session?.nombre
+  console.log(data, uid)
+
+  try {
+    await keyDB.lpush(String(uid), data)
+    res.status(200).json({})
+  } catch (error) {
+    console.log(error)
+    res.status(400).json({})
+  }
+}
+export async function GetCart(req:Express.RequestS, res:Response) {
+  console.log(req.session?.idu)
+  let uid = req.session?.idu
+  try {
+    let data = await keyDB.lrange(String(uid), 0, -1)
+    res.status(200).json(data)
+  } catch (error) {
+    console.log(error)
+    res.status(400).json({})
   }
 }

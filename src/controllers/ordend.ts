@@ -4,7 +4,6 @@ import type { Express } from "../types"
 import { keyDB } from "../db/keydbConf"
 import { QueryTypes } from "sequelize"
 import { agregarDiasAFecha } from "../lib/utils/fecha"
-import { Orden } from "../lib/zchemas"
 
 export async function MiddlewareORden(
   req: Express.RequestS,
@@ -20,6 +19,16 @@ export async function MiddlewareORden(
     let tokenVal = await keyDB.hgetall(sessionToken)
     console.log(tokenVal)
 
+    if(req.originalUrl.includes("crear")) {
+    req.session = {
+      estado: Number(tokenVal.estado),
+      idu: Number(tokenVal.idu),
+      nombre: tokenVal.nombre,
+      rol: Number(tokenVal.rol),
+    }
+    console.log("soy crear", tokenVal.idu, sessionToken)
+    next()
+    }
     if (
       Number(tokenVal.rol) !== 1 &&
       req.originalUrl.includes("all") &&
@@ -166,9 +175,13 @@ export async function ListAllUser(req: Express.RequestS, res: Response) {
 }
 export async function Crear(req: Express.RequestS, res: Response) {
   //TODO: crear pedido y articulos en zod
-  const data = req.body
+  const {articulos, pedido} = req.body
+  console.log("Articulos------------------------------")
+  console.log(articulos)
+  console.log("pedido------------------------------")
+  console.log( pedido)
+  console.log(req.session?.idu)
   try {
-    const { articulos, pedido } = Orden.parse(data)
     const resultado = await sequelize.transaction(async (t) => {
       try {
         const nuevoPedido = await sequelize.query(
@@ -177,13 +190,13 @@ export async function Crear(req: Express.RequestS, res: Response) {
                 `,
           {
             replacements: {
-              estadoID: pedido.estado,
-              nombreCompleto: pedido.nombreCom,
+              estadoID: 1,
+              nombreCompleto: pedido.nombre_completo,
               direccion: pedido.direccion,
               telefono: pedido.telefono,
-              correo_electronico: pedido.correo,
-              total_orden: pedido.total,
-              cliente: pedido.cliente,
+              correo_electronico: pedido.correo_electronico,
+              total_orden: parseFloat(pedido.total_orden),
+              cliente: req.session?.idu,
             },
             type: QueryTypes.RAW,
             transaction: t,
@@ -199,10 +212,10 @@ export async function Crear(req: Express.RequestS, res: Response) {
             {
               replacements: {
                 ordenid: idPedido,
-                productoid: element.pid,
+                productoid: element.Productos_idProductos,
                 cantidad: element.cantidad,
-                precio: element.precio,
-                subtotal: element.subtotal,
+                precio: parseFloat(element.precio),
+                subtotal: parseFloat(element.subtotal),
               },
               type: QueryTypes.RAW,
               transaction: t,
@@ -211,6 +224,7 @@ export async function Crear(req: Express.RequestS, res: Response) {
         }
         return nuevoPedido
       } catch (error) {
+        console.log(error)
         await t.rollback()
       }
     })
