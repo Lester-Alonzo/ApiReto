@@ -7,7 +7,10 @@ import { Clientes } from "../lib/zchemas"
 import { secreKeyJWT } from "../lib/constants"
 import jwt from "jsonwebtoken"
 import { PswUtils } from "../lib/utils/OTPswd"
-import {SendEmail} from '../lib/mail'
+import { SendEmail } from "../lib/mail"
+import { ComparePassword, HassPass } from "../lib/utils/encry"
+import { ClientesAtt } from "../db/models/clientes"
+import { randomUUID } from "crypto"
 
 process.loadEnvFile()
 
@@ -119,7 +122,7 @@ export async function VerifyUser(req: Express.RequestS, res: Response) {
             `,
       {
         replacements: {
-          id: req.session?.idu
+          id: req.session?.idu,
         },
         type: QueryTypes.SELECT,
       },
@@ -135,11 +138,12 @@ export async function Crear(req: Express.RequestS, res: Response) {
   const data = req.body
   console.log(data)
   try {
-    const { direccion, email, nombre, razonsocial, telefono } =
+    const { direccion, email, nombre, razonsocial, telefono, pass} =
       Clientes.parse(data)
+    const passH = await HassPass(pass, 10)
     await sequelize.query(
       `
-            EXEC CrearClientes :razon, :nombre, :direccion, :telefono, :email, :estado
+            EXEC CrearClientes :razon, :nombre, :direccion, :telefono, :email, :estado, :pass
             `,
       {
         replacements: {
@@ -147,20 +151,24 @@ export async function Crear(req: Express.RequestS, res: Response) {
           nombre,
           direccion,
           telefono,
-          estado:1,
+          estado: 1,
           email,
+          pass: passH
         },
         type: QueryTypes.RAW,
       },
     )
-    await SendEmail(email, nombre, {asunto:"Usuario Creado", body:`<h1>Usuario Creado Exitosamente</h1>`})
+    await SendEmail(email, nombre, {
+      asunto: "Usuario Creado",
+      body: `<h1>Usuario Creado Exitosamente</h1>`,
+    })
     res.status(200).json({})
   } catch (error) {
     console.log(error)
     res.status(400).json({})
   }
 }
-export async function Login(req: Express.RequestS, res: Response) {
+export async function LoginV1(req: Express.RequestS, res: Response) {
   const { email } = req.body
   try {
     let [resultado]: Clientes[] = await sequelize.query(
@@ -186,21 +194,61 @@ export async function Login(req: Express.RequestS, res: Response) {
     let rund = crypto.randomUUID()
     let url = `${process.env.urlfront}confirmlogin/${rund}`
     await keyDB.set(rund, hassed)
-    await SendEmail(resultado.email, resultado.nombre_comercial, {asunto:"Login en la app", body:`<a href="${url}">Confirmar Login</a>`})
+    await SendEmail(resultado.email, resultado.nombre_comercial, {
+      asunto: "Login en la app",
+      body: `<a href="${url}">Confirmar Login</a>`,
+    })
     res.status(200).json({ url })
   } catch (error) {
     console.error(error)
     res.status(400).json({})
   }
 }
+
+
+export async function LoginV2(req: Express.RequestS, res: Response) {
+  const { email, pass } = req.body
+  try {
+    let [resultado]: ClientesAtt[] = await sequelize.query(
+      "SELECT * FROM Clientes WHERE email = :mail",
+      {
+        replacements: {
+          mail: email,
+        },
+        type: QueryTypes.SELECT,
+      },
+    )
+    if (resultado === undefined) throw new Error("Usuario no encontrado")
+      console.log(resultado.password, pass)
+    let result = await ComparePassword(pass, resultado.password)
+    if(!result) throw new Error("Password Erronea")
+    const payload = {
+      idu: resultado.idClientes,
+      rol: 2,
+      estado: resultado.estado_idEstado,
+      nombre: resultado.nombre_comercial,
+    }
+    if(payload.estado !== 1) res.status(400).json({message:"Tu usuario esta Desactivado"})
+    let acceskey = randomUUID()
+    const token = jwt.sign(payload, secreKeyJWT)
+    await keyDB.hmset(acceskey, payload)
+    await keyDB.expire(acceskey, 86400)
+    res.setHeader('session', acceskey)
+    res.status(200).json({token, session:acceskey, error:null})
+  } catch (error) {
+    console.error(error)
+    res.status(400).json({token:null, message:"Credenciales Erroneas"})
+  }
+}
+
 export async function ConfirmLogin(req: Express.RequestS, res: Response) {
   const { key } = req.params
-  console.log(key)
   try {
     if (!key || (await keyDB.exists(key)) === 0)
       throw new Error("Llave erronea")
     let encypuser = (await keyDB.get(key)) as string
     let user = JSON.parse(puutils.decrypt(encypuser))
+    if(user.estado !== 1) res.status(404).json({})
     const payload = {
       idu: user.idu,
       rol: user.rol,
@@ -216,22 +264,25 @@ export async function ConfirmLogin(req: Express.RequestS, res: Response) {
     await keyDB.hmset(acceskey, payload)
     await keyDB.expire(acceskey, 86400)
     //Se setea un header con la key de KeyDB
-    res.status(200).json({ token: token, error: null, session:acceskey })
+    res.status(200).json({ token: token, error: null, session: acceskey })
   } catch (err) {
     console.log(err)
   }
 }
 
-export async function EliminarCliente(req:Express.RequestS, res:Response) {
-  const {id} = req.params
+export async function EliminarCliente(req: Express.RequestS, res: Response) {
+  const { id } = req.params
   try {
-    const [] = await sequelize.query(`EXEC InactivarCliente :cliente, :estado `, {
-      replacements: {
-        cliente: id,
-        estado: 2
+    const [] = await sequelize.query(
+      `EXEC InactivarCliente :cliente, :estado `,
+      {
+        replacements: {
+          cliente: id,
+          estado: 2,
+        },
+        type: QueryTypes.RAW,
       },
-      type:QueryTypes.RAW
-    })
+    )
     res.status(200).json({})
   } catch (error) {
     console.log(error)
@@ -240,16 +291,19 @@ export async function EliminarCliente(req:Express.RequestS, res:Response) {
   }
 }
 
-export async function ActivarCliente(req:Express.RequestS, res:Response) {
-  const {id} = req.params
+export async function ActivarCliente(req: Express.RequestS, res: Response) {
+  const { id } = req.params
   try {
-    const [] = await sequelize.query(`EXEC InactivarCliente :cliente, :estado `, {
-      replacements: {
-        cliente: id,
-        estado: 1
+    const [] = await sequelize.query(
+      `EXEC InactivarCliente :cliente, :estado `,
+      {
+        replacements: {
+          cliente: id,
+          estado: 1,
+        },
+        type: QueryTypes.RAW,
       },
-      type:QueryTypes.RAW
-    })
+    )
     res.status(200).json({})
   } catch (error) {
     console.log(error)
@@ -258,26 +312,29 @@ export async function ActivarCliente(req:Express.RequestS, res:Response) {
   }
 }
 
-export async function UpdateCliente(req:Express.RequestS, res:Response) {
-   const { id } = req.params
+export async function UpdateCliente(req: Express.RequestS, res: Response) {
+  const { id } = req.params
   //data = [{campo:string, valor:any}=]
   const data = req.body
   console.log(data, id)
   try {
     const transaction = await sequelize.transaction(async (t) => {
       try {
-      for (const element of data) {
-      await sequelize.query(`EXEC ActualizarCampoClientes :id, :Campo, :NuevoValor`, {
-        replacements: {
-          id,
-          Campo: element.campo,
-          NuevoValor: element.nval
-        },
-        type:QueryTypes.RAW,
-        transaction:t
-    })
-      }
-      res.status(200).json({})
+        for (const element of data) {
+          await sequelize.query(
+            `EXEC ActualizarCampoClientes :id, :Campo, :NuevoValor`,
+            {
+              replacements: {
+                id,
+                Campo: element.campo,
+                NuevoValor: element.nval,
+              },
+              type: QueryTypes.RAW,
+              transaction: t,
+            },
+          )
+        }
+        res.status(200).json({})
       } catch (error) {
         console.log("Error en la transaccion")
       }
@@ -289,7 +346,7 @@ export async function UpdateCliente(req:Express.RequestS, res:Response) {
   }
 }
 
-export async function SetCart(req:Express.RequestS, res:Response) {
+export async function SetCart(req: Express.RequestS, res: Response) {
   const data = req.body
   let uid = req.session?.nombre
   console.log(data, uid)
@@ -302,7 +359,7 @@ export async function SetCart(req:Express.RequestS, res:Response) {
     res.status(400).json({})
   }
 }
-export async function GetCart(req:Express.RequestS, res:Response) {
+export async function GetCart(req: Express.RequestS, res: Response) {
   console.log(req.session?.idu)
   let uid = req.session?.idu
   try {

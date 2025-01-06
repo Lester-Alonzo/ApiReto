@@ -5,7 +5,7 @@ import {
   Crear,
   EliminarCliente,
   GetCart,
-  Login,
+  LoginV2,
   MiddlewareCliente,
   MiddlewareClientes,
   SetCart,
@@ -15,7 +15,6 @@ import {
 } from "../controllers/clientes"
 
 const Clientes = Router()
-
 
 /**
  * @swagger
@@ -35,7 +34,7 @@ const Clientes = Router()
  *           application/json:
  *             schema:
  *               type: array
- *               items: 
+ *               items:
  *                 type: object
  *                 description: Clientes
  *       400:
@@ -131,15 +130,15 @@ Clientes.get("/all", MiddlewareClientes, TodosLosClientes)
  *                   type: string
  *                   description: Mensaje de error.
  */
-Clientes.post("/login", Login)
+Clientes.post("/login", LoginV2)
 // esta se ejecuta mejor en el navegador y al final cuando este el Front va a hacer login directamente
-Clientes.get("/confirmlogin/:key", MiddlewareCliente,ConfirmLogin)
+Clientes.get("/confirmlogin/:key", ConfirmLogin)
 
 /**
  * @swagger
  * /clientes/crear:
  *   post:
- *     summary: Ruta para crear Clientes 
+ *     summary: Ruta para crear Clientes
  *     parameters:
  *       - in: header
  *         name: session
@@ -224,10 +223,11 @@ Clientes.get("/confirmlogin/:key", MiddlewareCliente,ConfirmLogin)
  *                   description: Mensaje de error.
  */
 Clientes.post("/crear", MiddlewareClientes, Crear)
-Clientes.delete("/eliminar/:id", EliminarCliente)
-Clientes.get("/activar/:id", ActivarCliente)
-Clientes.put("/actualizar/:id", UpdateCliente)
-Clientes.get("/virify", MiddlewareCliente,VerifyUser)
-Clientes.post("/cart", MiddlewareCliente,SetCart)
-Clientes.get("/cart", MiddlewareCliente,GetCart)
+Clientes.delete("/eliminar/:id", MiddlewareClientes, EliminarCliente)
+Clientes.get("/activar/:id", MiddlewareClientes, ActivarCliente)
+Clientes.put("/actualizar/:id", MiddlewareClientes, UpdateCliente)
+
+Clientes.get("/virify", MiddlewareCliente, VerifyUser)
+Clientes.post("/cart", MiddlewareCliente, SetCart)
+Clientes.get("/cart", MiddlewareCliente, GetCart)
 export { Clientes }

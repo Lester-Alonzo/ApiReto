@@ -9,15 +9,16 @@ import { estado } from "./routes/estado.route"
 import { CatProdu } from "./routes/categoriaproductos.route"
 import { Orden } from "./routes/orden.route"
 import { Clientes } from "./routes/clientes.route"
-import helmet from 'helmet'
+import {Admins} from './routes/users.route'
+import helmet from "helmet"
 // import {models} from './db/mssql'
 // import {Express} from './types'
 
 const app = express()
 
 app.use(cors())
-app.use(express.json({limit:"10mb"}))
-app.use(express.urlencoded({ extended: true, limit:"10mb" }))
+app.use(express.json({ limit: "10mb" }))
+app.use(express.urlencoded({ extended: true, limit: "10mb" }))
 app.use(helmet())
 app.use("/api-docs", SWServe, SWSetup(swaggerDosc))
 
@@ -38,5 +39,6 @@ app.use("/estado", estado)
 app.use("/categoria", CatProdu)
 app.use("/ordend", Orden)
 app.use("/clientes", Clientes)
+app.use("/admins", Admins)
 
 export { app }

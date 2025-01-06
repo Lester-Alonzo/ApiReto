@@ -19,24 +19,29 @@ export async function MiddlewareORden(
     let tokenVal = await keyDB.hgetall(sessionToken)
     console.log(tokenVal)
 
-    if(req.originalUrl.includes("crear")) {
-    req.session = {
-      estado: Number(tokenVal.estado),
-      idu: Number(tokenVal.idu),
-      nombre: tokenVal.nombre,
-      rol: Number(tokenVal.rol),
-    }
-    console.log("soy crear", tokenVal.idu, sessionToken)
-    next()
+    if (
+      req.originalUrl.includes("crear") ||
+      req.originalUrl.includes("orders") ||
+      req.originalUrl.includes("odelbuser")
+    ) {
+      req.session = {
+        estado: Number(tokenVal.estado),
+        idu: Number(tokenVal.idu),
+        nombre: tokenVal.nombre,
+        rol: Number(tokenVal.rol),
+      }
+      console.log("soy permitir user", tokenVal.idu, sessionToken)
+      return next()
     }
     if (
       Number(tokenVal.rol) !== 1 &&
-      req.originalUrl.includes("all") &&
-      req.originalUrl.includes("autorizar")
+      (req.originalUrl.includes("all") ||
+      req.originalUrl.includes("autorizar") || req.originalUrl.includes("odel"))
     ) {
+    console.log("soy rechazado por permisos")
       res.status(406).json({ message: "No tienes los suficientes privilegios" })
     }
-
+    console.log("soy admin")
     req.session = {
       estado: Number(tokenVal.estado),
       idu: Number(tokenVal.idu),
@@ -81,6 +86,7 @@ export async function ListOne(req: Express.RequestS, res: Response) {
   try {
     let result = await sequelize.query(
       `SELECT 
+            d.idOrdenDetalles AS id,
             d.cantidad,
             d.precio,
             p.nombre,
@@ -146,23 +152,19 @@ export async function Authorizacion(req: Express.RequestS, res: Response) {
   }
 }
 export async function ListAllUser(req: Express.RequestS, res: Response) {
+  console.log("soy Todas las ordenes", req.session?.idu)
   try {
     let result = await sequelize.query(
       `
             SELECT 
-            o.*,
-            COUNT(d.idOrdenDetalles) AS Cantidad_Productos
+            *
             FROM 
-            orden o
-            INNER JOIN
-            OrdenDetalles d ON o.idOrden = d.Orden_idOrden
-            GROUP BY
-                o.idOrden, o.usuarios_idusuarios, o.estados_idestados, o.client_idClient, o.fecha_creacion, o.nombre_completo, o.direccion, o.telefono, o.correo_electronico, o.fecha_entrega, o.total_orden
-            WHERE o.client_idClient = :id
+            orden
+            WHERE client_idClient = :id
             `,
       {
         replacements: {
-          id: req.session?.idu,
+          id: Number(req.session?.idu),
         },
         type: QueryTypes.SELECT,
       },
@@ -175,11 +177,11 @@ export async function ListAllUser(req: Express.RequestS, res: Response) {
 }
 export async function Crear(req: Express.RequestS, res: Response) {
   //TODO: crear pedido y articulos en zod
-  const {articulos, pedido} = req.body
+  const { articulos, pedido } = req.body
   console.log("Articulos------------------------------")
   console.log(articulos)
   console.log("pedido------------------------------")
-  console.log( pedido)
+  console.log(pedido)
   console.log(req.session?.idu)
   try {
     const resultado = await sequelize.transaction(async (t) => {
@@ -236,15 +238,18 @@ export async function Crear(req: Express.RequestS, res: Response) {
   }
 }
 export async function Rechazar(req: Express.RequestS, res: Response) {
-  const {id} = req.params
+  const { id } = req.params
   let rol = req.session?.rol
-  if(rol !== 1) res.status(403).json({message:"No se cuenta con los suficientes privilegios"})
+  if (rol !== 1)
+    res
+      .status(403)
+      .json({ message: "No se cuenta con los suficientes privilegios" })
   try {
     let exeCQuery = await sequelize.query(`EXEC InactivarOrden :id, 2`, {
-      replacements:{
-        id
+      replacements: {
+        id,
       },
-      type:QueryTypes.RAW
+      type: QueryTypes.RAW,
     })
     res.status(200).json({})
   } catch (error) {
@@ -253,14 +258,14 @@ export async function Rechazar(req: Express.RequestS, res: Response) {
   }
 }
 
-export async function EntregarOrden(req:Express.RequestS, res:Response) {
-  const {id} = req.params
+export async function EntregarOrden(req: Express.RequestS, res: Response) {
+  const { id } = req.params
   try {
     let result = await sequelize.query(`EXEC EntregarOrden :id`, {
-      replacements:{
-        id
-        },
-        type:QueryTypes.RAW
+      replacements: {
+        id,
+      },
+      type: QueryTypes.RAW,
     })
     res.status(200).json({})
   } catch (error) {
@@ -271,7 +276,7 @@ export async function EntregarOrden(req:Express.RequestS, res:Response) {
 }
 
 export async function GetOne(req: Express.RequestS, res: Response) {
-  const {id} = req.params
+  const { id } = req.params
   try {
     let result = await sequelize.query(
       `
@@ -287,8 +292,8 @@ export async function GetOne(req: Express.RequestS, res: Response) {
                 o.idOrden, o.usuarios_idusuarios, o.estados_idestados, o.client_idClient, o.fecha_creacion, o.nombre_completo, o.direccion, o.telefono, o.correo_electronico, o.fecha_entrega, o.total_orden, o.completado
             `,
       {
-        replacements:{
-          id
+        replacements: {
+          id,
         },
         type: QueryTypes.SELECT,
       },
@@ -297,5 +302,38 @@ export async function GetOne(req: Express.RequestS, res: Response) {
   } catch (error) {
     console.log(error)
     res.status(400).json({})
+  }
+}
+
+export async function DeleteOrdenDetalle(req:Express.RequestS, res:Response) {
+  const {id} = req.params
+  console.log("soy eliminar item cart")
+  try {
+    await sequelize.query(`DELETE FROM OrdenDetalles WHERE idOrdenDetalles = :id`, {
+      replacements:{
+        id
+      },
+      type:QueryTypes.DELETE
+    })
+    res.status(200).json({})
+  } catch (error) {
+    console.log(error)
+    res.json(400).json({})
+  }
+}
+export async function RechazarByUser(req: Express.RequestS, res: Response) {
+  const { id } = req.params
+  console.log("soy eliminar ordenuser")
+  try {
+    let exeCQuery = await sequelize.query(`EXEC InactivarOrden :id, 2`, {
+      replacements: {
+        id,
+      },
+      type: QueryTypes.RAW,
+    })
+    res.status(200).json({})
+  } catch (error) {
+    console.log(error)
+    res.status(400).json(error)
   }
 }

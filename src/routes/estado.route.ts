@@ -28,7 +28,7 @@ estado.use(MiddlewareEstado)
  *           application/json:
  *             schema:
  *               type: array
- *               items: 
+ *               items:
  *                 type: object
  *                 description: Estados
  *       400:
@@ -140,7 +140,7 @@ estado.post("/crear", CreateEstado)
  *         description: Token de sesión del usuario (ingresar manualmente)
  *       - in: path
  *         name: id
- *         schema: 
+ *         schema:
  *            type: string
  *         required: true
  *         description: id de la categoria

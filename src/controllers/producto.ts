@@ -87,7 +87,7 @@ export async function CraerProducto(
           nombre,
           marca,
           codigo: randomUUID(),
-          stock:Number(stock),
+          stock: Number(stock),
           estados_idestados: Number(estado),
           CategoriaProductos_IDCategoria: Number(categoria),
           precio: Number(precion),
@@ -110,18 +110,21 @@ export async function UpdateProduct(req: Express.RequestS, res: Response) {
   try {
     const transaction = await sequelize.transaction(async (t) => {
       try {
-      for (const element of data) {
-      await sequelize.query(`EXEC ActualizarCampoProducto :id, :Campo, :NuevoValor`, {
-        replacements: {
-          id,
-          Campo: element.campo,
-          NuevoValor: element.nval
-        },
-        type:QueryTypes.RAW,
-        transaction:t
-    })
-      }
-      res.status(200).json({})
+        for (const element of data) {
+          await sequelize.query(
+            `EXEC ActualizarCampoProducto :id, :Campo, :NuevoValor`,
+            {
+              replacements: {
+                id,
+                Campo: element.campo,
+                NuevoValor: element.nval,
+              },
+              type: QueryTypes.RAW,
+              transaction: t,
+            },
+          )
+        }
+        res.status(200).json({})
       } catch (error) {
         console.log("Error en la transaccion")
       }
@@ -143,13 +146,13 @@ export async function EliminarProducto(req: Express.RequestS, res: Response) {
           idProducto: id,
           idEstado: 2,
         },
-        type:QueryTypes.RAW
+        type: QueryTypes.RAW,
       },
     )
     res.status(200).json(result)
   } catch (err) {
     console.log(err)
-    res.status(404).json({err})
+    res.status(404).json({ err })
   }
 }
 
@@ -163,12 +166,12 @@ export async function ActivarProducto(req: Express.RequestS, res: Response) {
           idProducto: id,
           idEstado: 1,
         },
-        type:QueryTypes.RAW
+        type: QueryTypes.RAW,
       },
     )
     res.status(200).json(result)
   } catch (err) {
     console.log(err)
-    res.status(404).json({err})
+    res.status(404).json({ err })
   }
 }

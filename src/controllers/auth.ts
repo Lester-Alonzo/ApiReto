@@ -11,7 +11,7 @@ import { PswUtils } from "../lib/utils/OTPswd"
 import type { usuariosAtt } from "../db/models/usuarios"
 import { secreKeyJWT } from "../lib/constants"
 import { keyDB } from "../db/keydbConf"
-import {SendEmail} from '../lib/mail'
+import { SendEmail } from "../lib/mail"
 
 const PsU = new PswUtils(4, "58a9ffde36ab689dae34")
 
@@ -49,7 +49,7 @@ export async function Login(req: Request, res: Response) {
     await keyDB.expire(acceskey, 86400)
     //Se setea un header con la key de KeyDB
     res.setHeader("session", acceskey)
-    res.status(200).json({ token: token, session: acceskey,error: null })
+    res.status(200).json({ token: token, session: acceskey, error: null })
   } catch (error) {
     res.status(404).json({ token: null, error: error })
   }
@@ -58,8 +58,7 @@ export async function Login(req: Request, res: Response) {
 export async function Register(req: Request, res: Response) {
   const datos = req.body
   try {
-    let { email, pass, telefono, nombre } =
-      Credentials.parse(datos)
+    let { email, pass, telefono, nombre } = Credentials.parse(datos)
     const passH = await HassPass(pass, 10)
     let [reusltados] = await sequelize.query(
       "EXEC CrearUsuarios :rol_idrol, :estados_idestados, :correo_electronico, :nombre_completo, :password, :telefono",
@@ -76,7 +75,10 @@ export async function Register(req: Request, res: Response) {
       },
     )
     console.log(reusltados)
-    await SendEmail(email, nombre, {asunto:"Confirmar usuario", body:`<h1>Felicidades tu usuario fue creado</h1>`})
+    await SendEmail(email, nombre, {
+      asunto: "Confirmar usuario",
+      body: `<h1>Felicidades tu usuario fue creado</h1>`,
+    })
     res.status(200).json({ created: true, error: null })
   } catch (error) {
     res.status(404).json({ created: false, error: error })

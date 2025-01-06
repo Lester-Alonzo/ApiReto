@@ -8,7 +8,9 @@ import {
   Crear,
   Rechazar,
   EntregarOrden,
-  GetOne
+  GetOne,
+  DeleteOrdenDetalle,
+  RechazarByUser,
 } from "../controllers/ordend"
 
 const Orden = Router()
@@ -33,7 +35,7 @@ Orden.use(MiddlewareORden)
  *           application/json:
  *             schema:
  *               type: array
- *               items: 
+ *               items:
  *                 type: object
  *                 description: Estados
  *       400:
@@ -68,13 +70,14 @@ Orden.use(MiddlewareORden)
  *                   description: Mensaje de error.
  */
 Orden.get("/all", ListAll)
-Orden.get("/one/:id",GetOne)
+Orden.get("/one/:id", GetOne)
 Orden.get("/autorizar/:id", Authorizacion)
 Orden.get("/rechazar/:id", Rechazar)
 Orden.post("/crear", Crear)
 Orden.get("/orders", ListAllUser)
 Orden.get("/order/:orderid", ListOne)
 Orden.put("/entregar/:id", EntregarOrden)
-
+Orden.delete("/odel/:id", DeleteOrdenDetalle)
+Orden.delete("/odelbuser/:id", RechazarByUser)
 
 export { Orden }

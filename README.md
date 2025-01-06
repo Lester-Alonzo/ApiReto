@@ -6,24 +6,25 @@
 ![Docker](https://img.shields.io/badge/Docker-2CA5E0?style=for-the-badge&logo=docker&logoColor=white)
 
 ---
+
 **Participante Clave:** _GDA00465-OT_ **Grupo**: B
 
 ---
+
 Esta api esta disenada para las necesidades de Mi Tiendita Online.
 
 - Documentacion en swagger para testear los enpoints en la ruta: **/api-docs**
 - Puerto del Servidor: **5898**
 - Requerimientos: **SQLServer 2019**, **Keydb**
+
 ---
 
 ### Correr Dependencias
-
 
 ```bash
   docker run -e "ACCEPT_EULA=Y" -e "MSSQL_SA_PASSWORD=Reto360@"  -p 1433:1433  --name sqlServer --hostname sqlServer -d mcr.microsoft.com/mssql/server:2019-latest
   docker run --name some-keydb -dp 6379:6379 docker.io/eqalpha/keydb
 ```
-
 
 > Viendo la reunion del 10/12/2024 se toco el tema del ORM y que los CRUD y funciones se arian mediante los procedure de la DB, cree los modelos y un esquema rapido de relaciones que no utilice, pero los deje ya que como cualquier proyecto que quiera escalar, se podria necesitar en el futuro.
 
@@ -36,7 +37,6 @@ Esta api esta disenada para las necesidades de Mi Tiendita Online.
 - **/categoria(middleware para validar sesion y rol)**: Ruta para administrar las categorias
 - **/ordend(middleware para validar sesion y rol)**: Ruta para crear ordenes, y autorizar las mismas
 - **/clientes(middleware para validar sesion y rol)**: Ruta para el login de clientes, y para la creacion y listarlos
-
 
 ## Ejecutar Proyecto:
 

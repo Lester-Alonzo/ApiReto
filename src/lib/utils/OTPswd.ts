@@ -24,6 +24,18 @@ export class PswUtils {
       resolve(returnned)
     })
   }
+  async RandomPass(leng:number): Promise<string> {
+    return new Promise((resolve) => {
+      const caracteres = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+[]{}|;:,.<>?'
+      let pass = ""
+      for (let i = 0; i < leng; i++) {
+        const indiceAleatorio = Math.floor(Math.random() * caracteres.length);
+        const element = caracteres[indiceAleatorio];
+        pass += element
+      }
+      resolve(pass)
+    })
+  }
   encrypt(text: string) {
     const cipher = crypto.createCipheriv(this.#alg, this.#keyText, this.#iv)
     let encrypted = cipher.update(text, "utf8", "hex")

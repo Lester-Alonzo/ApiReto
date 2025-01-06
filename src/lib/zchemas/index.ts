@@ -70,4 +70,5 @@ export const Clientes = z.object({
     .string()
     .regex(/^\d{4}-\d{4}$/, "No es la estructura de un telefono"),
   email: z.string().email(),
+  pass: z.string(),
 })
