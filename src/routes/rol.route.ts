@@ -28,7 +28,7 @@ rol.use(MiddlewareRol)
  *           application/json:
  *             schema:
  *               type: array
- *               items: 
+ *               items:
  *                 type: object
  *                 description: Clientes
  *       400:

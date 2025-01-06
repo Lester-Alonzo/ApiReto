@@ -28,7 +28,7 @@ CatProdu.use(MiddlewareCP)
  *           application/json:
  *             schema:
  *               type: array
- *               items: 
+ *               items:
  *                 type: object
  *                 description: Objeto de categoria
  *       400:
@@ -146,7 +146,7 @@ CatProdu.post("/crear", CrearCategoria)
  *         description: Token de sesión del usuario (ingresar manualmente)
  *       - in: path
  *         name: id
- *         schema: 
+ *         schema:
  *            type: string
  *         required: true
  *         description: id de la categoria

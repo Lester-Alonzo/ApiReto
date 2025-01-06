@@ -475,6 +475,26 @@ BEGIN
 		)
 END
 
+CREATE TRIGGER trg_AfterDElete_OrdenDetalles
+ON OrdenDetalles
+AFTER DELETE 
+AS
+BEGIN
+	DECLARE @OrdenID INT;
+	DECLARE @NuevoTotal DECIMAL(18, 2);
+	
+	SELECT @OrdenID = Orden_idOrden FROM deleted;
+	
+	SELECT @NuevoTotal = SUM(precio * cantidad)
+	FROM OrdenDetalles
+	WHERE Orden_idOrden = @OrdenID;
+	
+	UPDATE Orden
+	SET total_orden = @NuevoTotal
+	WHERE idOrden = @OrdenID;
+END;
+
+
 
 
 CREATE PROCEDURE ActualizarCategoria

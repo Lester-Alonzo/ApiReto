@@ -6,20 +6,25 @@ cloudinary.config({
   api_key: "693929191313383",
   api_secret: APISCRET, // Click 'View API Keys' above to copy your API secret
 })
-export async function UpImage(foto: Buffer):Promise<string> {
+export async function UpImage(foto: Buffer): Promise<string> {
   return new Promise((resolve, reject) => {
-  let urlFinal = ""
-  let randomR = crypto.randomUUID()
-  cloudinary.uploader.upload_stream({resource_type:"auto", public_id:randomR}, (error, result) => {
-    if(error) reject("error al subir la imagen")
-    let url = result?.secure_url
-    urlFinal = url as string
-  }).end(foto)
-  let optimized = cloudinary.url(randomR, {
-    fetch_format:"auto",
-    quality:"auto"
-  })
-  resolve(optimized)
+    let urlFinal = ""
+    let randomR = crypto.randomUUID()
+    cloudinary.uploader
+      .upload_stream(
+        { resource_type: "auto", public_id: randomR },
+        (error, result) => {
+          if (error) reject("error al subir la imagen")
+          let url = result?.secure_url
+          urlFinal = url as string
+        },
+      )
+      .end(foto)
+    let optimized = cloudinary.url(randomR, {
+      fetch_format: "auto",
+      quality: "auto",
+    })
+    resolve(optimized)
   })
 }
 ;(async function () {

@@ -9,7 +9,6 @@ import {
 
 const auth = Router()
 
-
 /**
  * @swagger
  * /auth/register:

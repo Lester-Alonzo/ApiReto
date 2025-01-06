@@ -11,7 +11,10 @@ import {
 const producto = Router()
 
 const storage = multer.memoryStorage()
-const upload = multer({ storage: storage, limits:{fileSize: (10 * 1024 * 1024) } })
+const upload = multer({
+  storage: storage,
+  limits: { fileSize: 10 * 1024 * 1024 },
+})
 /**
  * @swagger
  * /productos/list:
@@ -30,7 +33,7 @@ const upload = multer({ storage: storage, limits:{fileSize: (10 * 1024 * 1024) }
  *           application/json:
  *             schema:
  *               type: array
- *               items: 
+ *               items:
  *                 type: object
  *                 description: Clientes
  *       400:
