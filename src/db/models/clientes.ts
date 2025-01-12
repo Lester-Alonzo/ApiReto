@@ -7,6 +7,8 @@ export interface ClientesAtt {
   direccion_entrega: string
   telefono: string
   email: string
+  password:string
+  estado_idEstado: number
 }
 interface ClientesInstance
   extends Model<ClientesAtt, ClientesAtt>,
@@ -44,6 +46,18 @@ export function ClientesModel(sequelize: Sequelize) {
         unique: true,
         allowNull: false,
       },
+      password:{
+        type: DataTypes.STRING(100),
+        allowNull:false
+      },
+      estado_idEstado:{
+        type:DataTypes.INTEGER,
+        allowNull:false,
+        references: {
+          table:"estados",
+          key:"idestados"
+        }
+      }
     },
     {
       tableName: "Clientes",

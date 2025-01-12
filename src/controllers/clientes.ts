@@ -7,8 +7,11 @@ import { Clientes } from "../lib/zchemas"
 import { secreKeyJWT } from "../lib/constants"
 import jwt from "jsonwebtoken"
 import { PswUtils } from "../lib/utils/OTPswd"
-import { SendEmail } from "../lib/mail"
+import {SendEmail} from '../lib/mail'
 
+import {HassPass, ComparePassword} from '../lib/utils/encry'
+import type { ClientesAtt} from '../db/models/clientes'
+import {randomUUID} from 'crypto'
 process.loadEnvFile()
 
 interface Clientes {
@@ -135,11 +138,12 @@ export async function Crear(req: Express.RequestS, res: Response) {
   const data = req.body
   console.log(data)
   try {
-    const { direccion, email, nombre, razonsocial, telefono } =
+    const { direccion, email, nombre, razonsocial, telefono, pass} =
       Clientes.parse(data)
+    const passH = await HassPass(pass, 10)
     await sequelize.query(
       `
-            EXEC CrearClientes :razon, :nombre, :direccion, :telefono, :email, :estado
+            EXEC CrearClientes :razon, :nombre, :direccion, :telefono, :email, :estado, :pass
             `,
       {
         replacements: {
@@ -149,6 +153,7 @@ export async function Crear(req: Express.RequestS, res: Response) {
           telefono,
           estado: 1,
           email,
+          pass: passH
         },
         type: QueryTypes.RAW,
       },
@@ -163,7 +168,7 @@ export async function Crear(req: Express.RequestS, res: Response) {
     res.status(400).json({})
   }
 }
-export async function Login(req: Express.RequestS, res: Response) {
+export async function LoginV1(req: Express.RequestS, res: Response) {
   const { email } = req.body
   try {
     let [resultado]: Clientes[] = await sequelize.query(
@@ -199,6 +204,43 @@ export async function Login(req: Express.RequestS, res: Response) {
     res.status(400).json({})
   }
 }
+
+
+export async function LoginV2(req: Express.RequestS, res: Response) {
+  const { email, pass } = req.body
+  try {
+    let [resultado]: ClientesAtt[] = await sequelize.query(
+      "SELECT * FROM Clientes WHERE email = :mail",
+      {
+        replacements: {
+          mail: email,
+        },
+        type: QueryTypes.SELECT,
+      },
+    )
+    if (resultado === undefined) throw new Error("Usuario no encontrado")
+      console.log(resultado.password, pass)
+    let result = await ComparePassword(pass, resultado.password)
+    if(!result) throw new Error("Password Erronea")
+    const payload = {
+      idu: resultado.idClientes,
+      rol: 2,
+      estado: resultado.estado_idEstado,
+      nombre: resultado.nombre_comercial,
+    }
+    if(payload.estado !== 1) res.status(400).json({message:"Tu usuario esta Desactivado"})
+    let acceskey = randomUUID()
+    const token = jwt.sign(payload, secreKeyJWT)
+    await keyDB.hmset(acceskey, payload)
+    await keyDB.expire(acceskey, 86400)
+    res.setHeader('session', acceskey)
+    res.status(200).json({token, session:acceskey, error:null})
+  } catch (error) {
+    console.error(error)
+    res.status(400).json({token:null, message:"Credenciales Erroneas"})
+  }
+}
+
 export async function ConfirmLogin(req: Express.RequestS, res: Response) {
   const { key } = req.params
   try {

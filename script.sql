@@ -23,6 +23,7 @@ CREATE TABLE Clientes (
     direccion_entrega VARCHAR(45) NULL,
     telefono VARCHAR(45) NOT NULL UNIQUE,
     email VARCHAR(45) UNIQUE NOT NULL,
+    password VARCHAR(100) NOT NULL,
     estado_idEstado int NOT NULL
     FOREIGN KEY (estado_idEstado) REFERENCES estados(idestados)
 );
@@ -194,11 +195,12 @@ CREATE PROCEDURE CrearClientes
     @direccion_entrega VARCHAR(45),
     @telefono VARCHAR(45),
     @email VARCHAR(45),
-    @estado INT
+    @estado INT,
+    @pass VARCHAR(100)
 AS
 BEGIN
-    INSERT INTO Clientes (razon_social, estado_idEstado,nombre_comercial, direccion_entrega, telefono, email)
-    VALUES (@razon_social, @estado ,@nombre_comercial, @direccion_entrega, @telefono, @email);
+    INSERT INTO Clientes (razon_social, estado_idEstado,nombre_comercial, direccion_entrega, telefono, email, password)
+    VALUES (@razon_social, @estado ,@nombre_comercial, @direccion_entrega, @telefono, @email, @pass);
 END;
 
 CREATE PROCEDURE CrearUsuarios
@@ -473,7 +475,27 @@ BEGIN
 		AND EXISTS  (
 			SELECT 1 FROM inserted WHERE estados_idestados = 1
 		)
-END
+END;
+
+CREATE TRIGGER trg_AfterDElete_OrdenDetalles
+ON OrdenDetalles
+AFTER DELETE 
+AS
+BEGIN
+	DECLARE @OrdenID INT;
+	DECLARE @NuevoTotal DECIMAL(18, 2);
+	
+	SELECT @OrdenID = Orden_idOrden FROM deleted;
+	
+	SELECT @NuevoTotal = SUM(precio * cantidad)
+	FROM OrdenDetalles
+	WHERE Orden_idOrden = @OrdenID;
+	
+	UPDATE Orden
+	SET total_orden = @NuevoTotal
+	WHERE idOrden = @OrdenID;
+END;
+
 
 CREATE TRIGGER trg_AfterDElete_OrdenDetalles
 ON OrdenDetalles
@@ -644,13 +666,14 @@ EXEC CrearEstados 'Activo';
 EXEC CrearEstados 'Inactivo';
 
 
-EXEC CrearClientes 'Razon Social Cliente A', 'ClienteA', 'Direccion A', '11111', 'clienteA@mail.com', 1;
-EXEC CrearClientes 'Razon Social Cliente B', 'ClienteB', 'Direccion B', '22222', 'clienteB@mail.com', 1;
+EXEC CrearClientes 'Razon Social Cliente A', 'ClienteA', 'Direccion A', '11111', 'clienteA@mail.com', 1, 'pass';
+EXEC CrearClientes 'Razon Social Cliente B', 'ClienteB', 'Direccion B', '22222', 'clienteB@mail.com', 1, 'pass';
+EXEC CrearClientes 'Trabajador de Empresa Comercial SA', 'Lester', 'Guatemala Calle B', '5556-1347', 'lestergeo96@gmail.com', 1, '$2b$10$XlVNL71gOIyb6QRUlk/5q.0qktZd3iSy7OO3GH3OrYh9zBQr5OH8K';
 
-
-EXEC CrearUsuarios 1, 1, 'admin@mail.com', 'Administrador', 'pass', '1111111';
-EXEC CrearUsuarios 1, 1, 'userA@mail.com', 'Usuario A', 'pass', '2222222';
-EXEC CrearUsuarios 1, 1, 'userB@mail.com', 'Usuario B', 'pass', '3333333';
+--pass L3ster2025@
+EXEC CrearUsuarios 1, 1, 'lestergeo96@gmail.com', 'Lester Alonzo', '$2b$10$XlVNL71gOIyb6QRUlk/5q.0qktZd3iSy7OO3GH3OrYh9zBQr5OH8K', '1111111';
+--EXEC CrearUsuarios 1, 1, 'userA@mail.com', 'Usuario A', 'pass', '2222222';
+--EXEC CrearUsuarios 1, 1, 'userB@mail.com', 'Usuario B', 'pass', '3333333';
 
 
 EXEC ActualizarCampoUsuario @id=2, @Campo='Clientes_idClientes', @NuevoValor='1';
@@ -770,3 +793,5 @@ SELECT * FROM CategoriaProductos;
 SELECT * FROM Clientes;
 SELECT * FROM usuarios WHERE correo_electronico = N'admin@mail.com';
 SELECT * FROM sys.databases;
+
+--DELETE FROM Productos WHERE idProductos = 1;
