@@ -162,3 +162,27 @@ export async function RegisterUser(req:Express.RequestS, res: Response) {
     res.status(404).json({ created: false, error: error })
   }
 }
+
+export async function UpdateAdmin(req: Express.RequestS, res: Response) {
+  const { id } = req.params
+  //data = [{campo:string, valor:any}=]
+  const {campo, nval} = req.body
+  try {
+          await sequelize.query(
+            `EXEC ActualizarCampoUsuario :id, :Campo, :NuevoValor`,
+            {
+              replacements: {
+                id,
+                Campo: campo,
+                NuevoValor: nval,
+              },
+              type: QueryTypes.RAW,
+            },
+          )
+        res.status(200).json({})
+  } catch (error) {
+    console.error(error)
+    res.status(400).json({})
+    throw error
+  }
+}

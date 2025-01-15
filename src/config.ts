@@ -9,10 +9,7 @@ import { estado } from "./routes/estado.route"
 import { CatProdu } from "./routes/categoriaproductos.route"
 import { Orden } from "./routes/orden.route"
 import { Clientes } from "./routes/clientes.route"
-<<<<<<< HEAD
-=======
 import {Admins} from './routes/users.route'
->>>>>>> realtime
 import helmet from "helmet"
 // import {models} from './db/mssql'
 // import {Express} from './types'

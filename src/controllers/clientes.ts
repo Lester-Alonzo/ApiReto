@@ -43,7 +43,6 @@ export async function MiddlewareClientes(
     if (
       Number(tokenVal.rol) !== 1 &&
       req.originalUrl.includes("all") &&
-      req.originalUrl.includes("crear") &&
       Number(tokenVal.estado) === 2
     ) {
       res.status(406).json({ message: "No tienes los suficientes privilegios" })
@@ -69,8 +68,12 @@ export async function MiddlewareCliente(
 ): Promise<void> {
   try {
     let sessionToken = req.headers["session"] as string
-    if (!(await keyDB.exists(sessionToken))) {
+    if (!(await keyDB.exists(sessionToken)) && !req.originalUrl.includes("crear")) {
+      console.log("Soy el if de error", req.originalUrl.includes("crear"))
       res.status(405).json({ message: "Error con la session" })
+    }else if(!(await keyDB.exists(sessionToken)) || req.originalUrl.includes("crear")) {
+      console.log("soy el else if")
+      next()
     }
 
     let tokenVal = await keyDB.hgetall(sessionToken)
@@ -78,9 +81,9 @@ export async function MiddlewareCliente(
 
     if (
       req.originalUrl.includes("all") &&
-      req.originalUrl.includes("crear") &&
       Number(tokenVal.estado) === 2
     ) {
+      console.log("Soy el if de error de priviligios")
       res.status(406).json({ message: "No tienes los suficientes privilegios" })
     }
 
@@ -368,5 +371,50 @@ export async function GetCart(req: Express.RequestS, res: Response) {
   } catch (error) {
     console.log(error)
     res.status(400).json({})
+  }
+}
+
+export async function ChangePass(req: Request, res: Response) {
+  let { email } = req.body
+  let ruid = randomUUID()
+  try {
+    let [resultados]: ClientesAtt[] = await sequelize.query(
+      "SELECT * FROM usuarios WHERE correo_electronico = :email",
+      {
+        replacements: { email: email },
+        type: QueryTypes.SELECT,
+      },
+    )
+    let url = `${process.env.urlfront}cpass/${ruid}`
+    await keyDB.hset(ruid, {id:resultados.idClientes, estado:resultados.estado_idEstado})
+    if (resultados === undefined) throw new Error("Usuario no encontrado")
+    await SendEmail(resultados.email, resultados.nombre_comercial, {asunto:"Cambio de Password", body:`
+  <div>
+      <a href="${url}">Cambio de Password</a>
+  </div>
+      `})
+    res.status(200).json({ url })
+  } catch (error) {
+    res.status(400).json({ error })
+  }
+}
+
+export async function ChangePassClientes(req: Express.RequestS, res: Response) {
+  const {key} = req.params
+  let estado = await keyDB.hgetall(key)
+  const {nval} = req.body
+  try {
+    await sequelize.query("EXEC ActualizarCampoClientes :id, password, :nval", {
+      replacements:{
+        id:Number(estado.id), 
+        nval
+      },
+      type:QueryTypes.RAW
+    })
+    await keyDB.hdel(key)
+    res.status(200).json({})
+  } catch (error) {
+    console.log(error)
+    res.status(200).json({error})
   }
 }

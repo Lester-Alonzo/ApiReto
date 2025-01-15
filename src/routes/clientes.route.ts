@@ -1,6 +1,7 @@
 import { Router } from "express"
 import {
   ActivarCliente,
+  ChangePassClientes,
   ConfirmLogin,
   Crear,
   EliminarCliente,
@@ -222,7 +223,7 @@ Clientes.get("/confirmlogin/:key", ConfirmLogin)
  *                   type: string
  *                   description: Mensaje de error.
  */
-Clientes.post("/crear", MiddlewareClientes, Crear)
+Clientes.post("/crear", MiddlewareCliente, Crear)
 Clientes.delete("/eliminar/:id", MiddlewareClientes, EliminarCliente)
 Clientes.get("/activar/:id", MiddlewareClientes, ActivarCliente)
 Clientes.put("/actualizar/:id", MiddlewareClientes, UpdateCliente)
@@ -230,4 +231,5 @@ Clientes.put("/actualizar/:id", MiddlewareClientes, UpdateCliente)
 Clientes.get("/virify", MiddlewareCliente, VerifyUser)
 Clientes.post("/cart", MiddlewareCliente, SetCart)
 Clientes.get("/cart", MiddlewareCliente, GetCart)
+Clientes.put("/cpass/:key", MiddlewareCliente, ChangePassClientes)
 export { Clientes }
