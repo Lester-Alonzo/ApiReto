@@ -223,7 +223,7 @@ Clientes.get("/confirmlogin/:key", ConfirmLogin)
  *                   type: string
  *                   description: Mensaje de error.
  */
-Clientes.post("/crear", MiddlewareCliente, Crear)
+Clientes.post("/crear", Crear)
 Clientes.delete("/eliminar/:id", MiddlewareClientes, EliminarCliente)
 Clientes.get("/activar/:id", MiddlewareClientes, ActivarCliente)
 Clientes.put("/actualizar/:id", MiddlewareClientes, UpdateCliente)

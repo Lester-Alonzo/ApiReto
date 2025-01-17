@@ -10,6 +10,7 @@ import { CatProdu } from "./routes/categoriaproductos.route"
 import { Orden } from "./routes/orden.route"
 import { Clientes } from "./routes/clientes.route"
 import {Admins} from './routes/users.route'
+import {Stats} from './routes/stats.route'
 import helmet from "helmet"
 // import {models} from './db/mssql'
 // import {Express} from './types'
@@ -40,5 +41,6 @@ app.use("/categoria", CatProdu)
 app.use("/ordend", Orden)
 app.use("/clientes", Clientes)
 app.use("/admins", Admins)
+app.use("/stats", Stats)
 
 export { app }

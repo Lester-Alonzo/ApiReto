@@ -21,7 +21,7 @@ export async function SendEmail(
   mail: { asunto: string; body: string },
 ) {
   const senTFrom = new Sender(
-    "mitienditaonline@trial-jy7zpl9yvy0g5vx6.mlsender.net",
+    "info@mitienditaonline.online",
     "Mi Tiendita Online",
   )
   const recipients = [new Recipient(to, nombre)]

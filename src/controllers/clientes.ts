@@ -161,10 +161,6 @@ export async function Crear(req: Express.RequestS, res: Response) {
         type: QueryTypes.RAW,
       },
     )
-    await SendEmail(email, nombre, {
-      asunto: "Usuario Creado",
-      body: `<h1>Usuario Creado Exitosamente</h1>`,
-    })
     res.status(200).json({})
   } catch (error) {
     console.log(error)
@@ -236,7 +232,6 @@ export async function LoginV2(req: Express.RequestS, res: Response) {
     const token = jwt.sign(payload, secreKeyJWT)
     await keyDB.hmset(acceskey, payload)
     await keyDB.expire(acceskey, 86400)
-    res.setHeader('session', acceskey)
     res.status(200).json({token, session:acceskey, error:null})
   } catch (error) {
     console.error(error)

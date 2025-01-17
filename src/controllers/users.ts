@@ -156,6 +156,7 @@ export async function RegisterUser(req:Express.RequestS, res: Response) {
       <p>Tu Password: ${pass}</p>
       </div>`,
     })
+    console.log("Credenciales: ", email, pass)
     res.status(200).json({ created: true, error: null })
   } catch (error) {
     console.log(error)
